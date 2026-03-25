@@ -11,19 +11,23 @@ namespace FactoryClient.Views
         public DashboardView()
         {
             InitializeComponent();
-
             DataContext = _vm;
 
-            Start();
+            Loaded += DashboardView_Loaded;
         }
 
-        private async void Start()
+        private async void DashboardView_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            while (true)
+            await _vm.InitializeAsync(1);
+
+            _ = Task.Run(async () =>
             {
-                await _vm.LoadAsync(1);
-                await Task.Delay(500);
-            }
+                while (true)
+                {
+                    await _vm.LoadAsync(1);
+                    await Task.Delay(500);
+                }
+            });
         }
     }
 }

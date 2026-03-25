@@ -11,8 +11,9 @@ namespace FactoryApi.Services.CameraRuntime
         private readonly SnapshotFileService _snapshotFileService;
         private readonly ProductionPersistenceService _persistenceService;
         private readonly ILabelDetector _labelDetector;
-
         private readonly Dictionary<int, CameraSessionRunner> _sessions = new();
+        private readonly SemaphoreSlim _sessionLock = new(1, 1);
+
 
         public CameraOrchestrator(
             IServiceScopeFactory scopeFactory,
@@ -38,6 +39,86 @@ namespace FactoryApi.Services.CameraRuntime
             return null;
         }
 
+        public bool IsRunning(int cameraId)
+        {
+            return _sessions.ContainsKey(cameraId);
+        }
+
+        public async Task<bool> StartCameraAsync(int cameraId, CancellationToken token = default)
+        {
+            await _sessionLock.WaitAsync(token);
+            try
+            {
+                if (_sessions.ContainsKey(cameraId))
+                    return true;
+
+                using var scope = _scopeFactory.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<FactoryDbContext>();
+
+                var cam = await db.CameraConfigs
+                    .AsNoTracking()
+                    .Where(x => x.CameraId == cameraId)
+                    .Select(x => new CameraRuntimeConfig
+                    {
+                        CameraId = x.CameraId,
+                        CameraName = x.CameraName,
+                        RtspUrl = x.RtspUrl
+                    })
+                    .FirstOrDefaultAsync(token);
+
+                if (cam == null)
+                    return false;
+
+                var runner = new CameraSessionRunner(
+                    _loggerFactory.CreateLogger<CameraSessionRunner>(),
+                    _snapshotFileService,
+                    _persistenceService,
+                    cam.CameraId,
+                    cam.CameraName,
+                    cam.RtspUrl,
+                    _labelDetector);
+
+                _sessions.Add(cam.CameraId, runner);
+                await runner.StartAsync(token);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "StartCameraAsync error. CameraId={CameraId}", cameraId);
+                return false;
+            }
+            finally
+            {
+                _sessionLock.Release();
+            }
+        }
+
+        public async Task<bool> StopCameraAsync(int cameraId, CancellationToken token = default)
+        {
+            await _sessionLock.WaitAsync(token);
+            try
+            {
+                if (!_sessions.TryGetValue(cameraId, out var runner))
+                    return true;
+
+                await runner.StopAsync();
+                await runner.DisposeAsync();
+                _sessions.Remove(cameraId);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "StopCameraAsync error. CameraId={CameraId}", cameraId);
+                return false;
+            }
+            finally
+            {
+                _sessionLock.Release();
+            }
+        }
+
         public int GetCameraCount()
         {
             return _sessions.Count;
@@ -54,46 +135,54 @@ namespace FactoryApi.Services.CameraRuntime
                     var cameraConfigs = await LoadEnabledCamerasAsync(stoppingToken);
                     var currentIds = cameraConfigs.Select(x => x.CameraId).ToHashSet();
 
-                    foreach (var cam in cameraConfigs)
+                    await _sessionLock.WaitAsync(stoppingToken);
+                    try
                     {
-                        if (_sessions.ContainsKey(cam.CameraId))
-                            continue;
-
-                        var runner = new CameraSessionRunner(
-                            _loggerFactory.CreateLogger<CameraSessionRunner>(),
-                            _snapshotFileService,
-                            _persistenceService,
-                            cam.CameraId,
-                            cam.CameraName,
-                            cam.RtspUrl,
-                            _labelDetector);
-
-                        _sessions.Add(cam.CameraId, runner);
-                        await runner.StartAsync(stoppingToken);
-
-                        _logger.LogInformation(
-                            "Camera session added. CameraId={CameraId}, CameraName={CameraName}, RtspUrl={RtspUrl}",
-                            cam.CameraId,
-                            cam.CameraName,
-                            cam.RtspUrl);
-                    }
-
-                    var removedIds = _sessions.Keys
-                        .Where(id => !currentIds.Contains(id))
-                        .ToList();
-
-                    foreach (var id in removedIds)
-                    {
-                        if (_sessions.TryGetValue(id, out var runner))
+                        foreach (var cam in cameraConfigs)
                         {
-                            await runner.StopAsync();
-                            await runner.DisposeAsync();
-                            _sessions.Remove(id);
+                            if (_sessions.ContainsKey(cam.CameraId))
+                                continue;
+
+                            var runner = new CameraSessionRunner(
+                                _loggerFactory.CreateLogger<CameraSessionRunner>(),
+                                _snapshotFileService,
+                                _persistenceService,
+                                cam.CameraId,
+                                cam.CameraName,
+                                cam.RtspUrl,
+                                _labelDetector);
+
+                            _sessions.Add(cam.CameraId, runner);
+                            await runner.StartAsync(stoppingToken);
 
                             _logger.LogInformation(
-                                "Camera session removed. CameraId={CameraId}",
-                                id);
+                                "Camera session added. CameraId={CameraId}, CameraName={CameraName}, RtspUrl={RtspUrl}",
+                                cam.CameraId,
+                                cam.CameraName,
+                                cam.RtspUrl);
                         }
+
+                        var removedIds = _sessions.Keys
+                            .Where(id => !currentIds.Contains(id))
+                            .ToList();
+
+                        foreach (var id in removedIds)
+                        {
+                            if (_sessions.TryGetValue(id, out var runner))
+                            {
+                                await runner.StopAsync();
+                                await runner.DisposeAsync();
+                                _sessions.Remove(id);
+
+                                _logger.LogInformation(
+                                    "Camera session removed. CameraId={CameraId}",
+                                    id);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        _sessionLock.Release();
                     }
                 }
                 catch (OperationCanceledException)

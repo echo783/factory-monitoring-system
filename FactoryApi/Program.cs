@@ -1,4 +1,5 @@
 using FactoryApi.Data;
+using FactoryApi.Hubs;
 using FactoryApi.Repositories;
 using FactoryApi.Services;
 using FactoryApi.Services.CameraRuntime;
@@ -58,6 +59,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// ======================================================
+// AddSignalR
+// ======================================================
+builder.Services.AddSignalR();
 
 // ======================================================
 // MediaMTX
@@ -78,7 +83,6 @@ builder.Services.AddSingleton<CameraOrchestrator>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<CameraOrchestrator>());
 builder.Services.AddSingleton<ILabelDetector, DummyLabelDetector>();
 
-
 var app = builder.Build();
 
 
@@ -93,6 +97,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.MapHub<CameraHub>("/hubs/camera");
 
 
 // ======================================================

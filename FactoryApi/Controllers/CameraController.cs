@@ -3,6 +3,8 @@ using FactoryApi.Models;
 using FactoryApi.Services.CameraRuntime;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FactoryApi.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace FactoryApi.Controllers
 {
@@ -14,17 +16,20 @@ namespace FactoryApi.Controllers
         private readonly ILogger<CameraController> _logger;
         private readonly IWebHostEnvironment _env;
         private readonly CameraOrchestrator _orchestrator;
+        private readonly IHubContext<CameraHub> _hubContext;
 
         public CameraController(
-            FactoryDbContext context,
-            ILogger<CameraController> logger,
-            IWebHostEnvironment env,
-            CameraOrchestrator orchestrator)
+    FactoryDbContext context,
+    ILogger<CameraController> logger,
+    IWebHostEnvironment env,
+    CameraOrchestrator orchestrator,
+    IHubContext<CameraHub> hubContext)
         {
             _context = context;
             _logger = logger;
             _env = env;
             _orchestrator = orchestrator;
+            _hubContext = hubContext;
         }
 
         // 1. 전체 카메라 목록 조회
@@ -292,6 +297,121 @@ namespace FactoryApi.Controllers
 
             throw new IOException("latest 이미지 파일을 안정적으로 읽지 못했습니다.");
         }
+
+
+        // 9. 카메라 시작
+        [HttpPost("{cameraId:int}/start")]
+        public async Task<IActionResult> StartCamera(int cameraId, CancellationToken token)
+        {
+            var cam = await _context.CameraConfigs
+                .FirstOrDefaultAsync(x => x.CameraId == cameraId, token);
+
+            if (cam == null)
+                return NotFound($"CameraId={cameraId} 카메라를 찾을 수 없습니다.");
+
+            if (!cam.Enabled)
+            {
+                cam.Enabled = true;
+                await _context.SaveChangesAsync(token);
+            }
+
+            bool started = await _orchestrator.StartCameraAsync(cameraId, token);
+
+            if (!started)
+            {
+                cam.Enabled = false;
+                await _context.SaveChangesAsync(token);
+            }
+
+            var payload = new CameraControlStatusDto
+            {
+                CameraId = cam.CameraId,
+                CameraName = cam.CameraName,
+                Enabled = cam.Enabled,
+                Status = started ? "Running" : "Error",
+                Message = started ? "카메라가 즉시 시작되었습니다." : "카메라 시작 실패",
+                ChangedAt = DateTime.Now
+            };
+
+            await _hubContext.Clients.All.SendAsync("CameraStatusChanged", payload, token);
+
+            return Ok(payload);
+        }
+
+        // 10. 카메라 중지
+        [HttpPost("{cameraId:int}/stop")]
+        public async Task<IActionResult> StopCamera(int cameraId, CancellationToken token)
+        {
+            var cam = await _context.CameraConfigs
+                .FirstOrDefaultAsync(x => x.CameraId == cameraId, token);
+
+            if (cam == null)
+                return NotFound($"CameraId={cameraId} 카메라를 찾을 수 없습니다.");
+
+            if (cam.Enabled)
+            {
+                cam.Enabled = false;
+                await _context.SaveChangesAsync(token);
+            }
+
+            bool stopped = await _orchestrator.StopCameraAsync(cameraId, token);
+
+            if (!stopped)
+            {
+                cam.Enabled = true;
+                await _context.SaveChangesAsync(token);
+            }
+
+            var payload = new CameraControlStatusDto
+            {
+                CameraId = cam.CameraId,
+                CameraName = cam.CameraName,
+                Enabled = cam.Enabled,
+                Status = stopped ? "Stopped" : "Error",
+                Message = stopped ? "카메라가 즉시 중지되었습니다." : "카메라 중지 실패",
+                ChangedAt = DateTime.Now
+            };
+
+            await _hubContext.Clients.All.SendAsync("CameraStatusChanged", payload, token);
+
+            return Ok(payload);
+        }
+
+        // 11. 카메라 상태 조회
+        [HttpGet("{cameraId:int}/status")]
+        public async Task<IActionResult> GetRunStatus(int cameraId, CancellationToken token)
+        {
+            var cam = await _context.CameraConfigs
+                .FirstOrDefaultAsync(x => x.CameraId == cameraId, token);
+
+            if (cam == null)
+                return NotFound($"CameraId={cameraId} 카메라를 찾을 수 없습니다.");
+
+            bool isRunning = _orchestrator.IsRunning(cameraId);
+
+            string message;
+            if (cam.Enabled && isRunning)
+                message = "현재 실행 중입니다.";
+            else if (!cam.Enabled && !isRunning)
+                message = "현재 중지 상태입니다.";
+            else if (cam.Enabled && !isRunning)
+                message = "실행 요청 상태이지만 아직 세션이 준비되지 않았습니다.";
+            else
+                message = "중지 요청 상태이지만 세션 정리 중일 수 있습니다.";
+
+            var payload = new CameraControlStatusDto
+            {
+                CameraId = cam.CameraId,
+                CameraName = cam.CameraName,
+                Enabled = cam.Enabled,
+                Status = isRunning ? "Running" : "Stopped",
+                Message = message,
+                ChangedAt = DateTime.Now
+            };
+
+            return Ok(payload);
+        }
+
     }
 
     public sealed class SaveRoiRequest

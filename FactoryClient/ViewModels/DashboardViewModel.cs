@@ -2,6 +2,7 @@
 using FactoryClient.Services;
 using System;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace FactoryClient.ViewModels
@@ -9,6 +10,7 @@ namespace FactoryClient.ViewModels
     public class DashboardViewModel : ViewModelBase
     {
         private readonly CameraApiService _apiService = new CameraApiService();
+        private readonly CameraHubService _hubService = new CameraHubService();
 
         private string _pageTitle = "대시보드";
         private string _pageDescription = "실시간 카메라 상태와 생산 카운트를 확인합니다.";
@@ -17,6 +19,30 @@ namespace FactoryClient.ViewModels
         private string _labelText = "대기";
         private string _debugStateText = "상태 대기중";
         private BitmapImage? _cameraImage;
+
+        private string _cameraRunStatus = "확인중";
+        private string _cameraRunMessage = "카메라 상태를 불러오는 중입니다.";
+
+        public RelayCommand StartCameraCommand { get; }
+        public RelayCommand StopCameraCommand { get; }
+
+        public DashboardViewModel()
+        {
+            StartCameraCommand = new RelayCommand(async _ => await StartCameraAsync());
+            StopCameraCommand = new RelayCommand(async _ => await StopCameraAsync());
+
+            _hubService.CameraStatusChanged += payload =>
+            {
+                if (payload.CameraId != 1)
+                    return;
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    CameraRunStatus = payload.Status;
+                    CameraRunMessage = payload.Message;
+                });
+            };
+        }
 
         public string PageTitle
         {
@@ -88,6 +114,46 @@ namespace FactoryClient.ViewModels
             }
         }
 
+        public string CameraRunStatus
+        {
+            get => _cameraRunStatus;
+            set
+            {
+                _cameraRunStatus = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string CameraRunMessage
+        {
+            get => _cameraRunMessage;
+            set
+            {
+                _cameraRunMessage = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public async Task InitializeAsync(int cameraId = 1)
+        {
+            try
+            {
+                await _hubService.StartAsync();
+
+                var runStatus = await _apiService.GetCameraRunStatusAsync(cameraId);
+                if (runStatus != null)
+                {
+                    CameraRunStatus = runStatus.Status;
+                    CameraRunMessage = runStatus.Message;
+                }
+            }
+            catch (Exception ex)
+            {
+                CameraRunStatus = "Error";
+                CameraRunMessage = "SignalR 연결 실패: " + ex.Message;
+            }
+        }
+
         public async Task LoadAsync(int cameraId = 1)
         {
             try
@@ -123,6 +189,26 @@ namespace FactoryClient.ViewModels
             catch (Exception ex)
             {
                 DebugStateText = "API 오류\n" + ex.Message;
+            }
+        }
+
+        private async Task StartCameraAsync()
+        {
+            var ok = await _apiService.StartCameraAsync(1);
+            if (!ok)
+            {
+                CameraRunStatus = "Error";
+                CameraRunMessage = "카메라 시작 요청 실패";
+            }
+        }
+
+        private async Task StopCameraAsync()
+        {
+            var ok = await _apiService.StopCameraAsync(1);
+            if (!ok)
+            {
+                CameraRunStatus = "Error";
+                CameraRunMessage = "카메라 중지 요청 실패";
             }
         }
     }

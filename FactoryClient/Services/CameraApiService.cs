@@ -84,10 +84,38 @@ namespace FactoryClient.Services
             var url = "api/history/events";
             if (query.Count > 0)
                 url += "?" + string.Join("&", query);
-             
+
             var result = await _http.GetFromJsonAsync<List<ProductionEventDto>>(url);
             return result ?? new List<ProductionEventDto>();
         }
 
+        public async Task<CameraControlStatusDto?> GetCameraRunStatusAsync(int cameraId)
+        {
+            var res = await _http.GetAsync($"api/Camera/{cameraId}/status");
+
+            if (!res.IsSuccessStatusCode)
+                return null;
+
+            var json = await res.Content.ReadAsStringAsync();
+
+            return JsonSerializer.Deserialize<CameraControlStatusDto>(
+                json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+        }
+
+        public async Task<bool> StartCameraAsync(int cameraId)
+        {
+            var res = await _http.PostAsync($"api/Camera/{cameraId}/start", null);
+            return res.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> StopCameraAsync(int cameraId)
+        {
+            var res = await _http.PostAsync($"api/Camera/{cameraId}/stop", null);
+            return res.IsSuccessStatusCode;
+        }
     }
 }

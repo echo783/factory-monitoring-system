@@ -24,40 +24,72 @@
                        Margin="0,6,0,0"/>
         </StackPanel>
 
-        <!-- 카드 영역 -->
-        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,16">
+        <!-- 카드 + 버튼 영역 -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,16">
 
-            <Border Background="#EEF4FF" CornerRadius="10" Padding="16" Margin="6">
-                <StackPanel>
-                    <TextBlock Text="현재 생산량" Foreground="Gray"/>
-                    <TextBlock Text="{Binding ProductionCount}"
-                               FontSize="32"
-                               FontWeight="Bold"
-                               Foreground="Blue"/>
-                </StackPanel>
-            </Border>
+            <UniformGrid Columns="4" Margin="0,0,0,12">
 
-            <Border Background="#ECFDF3" CornerRadius="10" Padding="16" Margin="6">
-                <StackPanel>
-                    <TextBlock Text="회전 감지" Foreground="Gray"/>
-                    <TextBlock Text="{Binding RotationText}"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               Foreground="Green"/>
-                </StackPanel>
-            </Border>
+                <Border Background="#EEF4FF" CornerRadius="10" Padding="16" Margin="6">
+                    <StackPanel>
+                        <TextBlock Text="현재 생산량" Foreground="Gray"/>
+                        <TextBlock Text="{Binding ProductionCount}"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Foreground="Blue"/>
+                    </StackPanel>
+                </Border>
 
-            <Border Background="#FEF2F2" CornerRadius="10" Padding="16" Margin="6">
-                <StackPanel>
-                    <TextBlock Text="라벨 감지" Foreground="Gray"/>
-                    <TextBlock Text="{Binding LabelText}"
-                               FontSize="28"
-                               FontWeight="Bold"
-                               Foreground="Red"/>
-                </StackPanel>
-            </Border>
+                <Border Background="#ECFDF3" CornerRadius="10" Padding="16" Margin="6">
+                    <StackPanel>
+                        <TextBlock Text="회전 감지" Foreground="Gray"/>
+                        <TextBlock Text="{Binding RotationText}"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   Foreground="Green"/>
+                    </StackPanel>
+                </Border>
 
-        </UniformGrid>
+                <Border Background="#FEF2F2" CornerRadius="10" Padding="16" Margin="6">
+                    <StackPanel>
+                        <TextBlock Text="라벨 감지" Foreground="Gray"/>
+                        <TextBlock Text="{Binding LabelText}"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   Foreground="Red"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#F5F3FF" CornerRadius="10" Padding="16" Margin="6">
+                    <StackPanel>
+                        <TextBlock Text="카메라 상태" Foreground="Gray"/>
+                        <TextBlock Text="{Binding CameraRunStatus}"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="#6D28D9"/>
+                        <TextBlock Text="{Binding CameraRunMessage}"
+                                   Margin="0,6,0,0"
+                                   FontSize="12"
+                                   Foreground="Gray"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+            </UniformGrid>
+
+            <StackPanel Orientation="Horizontal" Margin="6,0,6,0">
+                <Button Content="카메라 시작"
+                        Width="120"
+                        Height="38"
+                        Margin="0,0,8,0"
+                        Command="{Binding StartCameraCommand}" />
+
+                <Button Content="카메라 중지"
+                        Width="120"
+                        Height="38"
+                        Margin="0,0,8,0"
+                        Command="{Binding StopCameraCommand}" />
+            </StackPanel>
+        </StackPanel>
 
         <!-- 영상 + 상태 -->
         <Grid Grid.Row="2">
