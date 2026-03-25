@@ -144,8 +144,8 @@ ProductionEvent로 저장합니다.
 
 ---
 
-## rtsp test
-url: mssql db/ FactoryDB / CameraConfig (Table) / 
+## rtsp image test
+mssql db/ FactoryDB / CameraConfig (Table) / 
 RtspUrl (column) : rtsp://admin:chan1324!@cksdnr7979223.iptime.org:8554/Streaming/Channels/101
 
 
