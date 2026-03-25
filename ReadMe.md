@@ -141,4 +141,11 @@ ProductionEvent로 저장합니다.
 카메라 기반 생산 자동화 시스템 구현  
 실시간 제어 및 상태 반영  
 영상 분석과 재고/출고 시스템 통합  
-확장 가능한 구조
+
+---
+
+## rtsp test
+url: mssql db/ FactoryDB / CameraConfig (Table) / 
+RtspUrl (column) : rtsp://admin:chan1324!@cksdnr7979223.iptime.org:8554/Streaming/Channels/101
+
+
