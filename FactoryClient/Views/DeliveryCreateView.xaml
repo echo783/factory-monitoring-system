@@ -1,0 +1,130 @@
+﻿<UserControl x:Class="FactoryClient.Views.DeliveryCreateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Background="White" Margin="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="140"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       Text="주문자명"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,12"
+                       FontWeight="Bold"/>
+            <TextBox Grid.Row="0" Grid.Column="1"
+                     Text="{Binding CustomerName, UpdateSourceTrigger=PropertyChanged}"
+                     Height="34"
+                     Margin="0,0,0,12"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0"
+                       Text="전화번호"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,12"
+                       FontWeight="Bold"/>
+            <TextBox Grid.Row="1" Grid.Column="1"
+                     Text="{Binding PhoneNumber, UpdateSourceTrigger=PropertyChanged}"
+                     Height="34"
+                     Margin="0,0,0,12"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0"
+                       Text="주소"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,12"
+                       FontWeight="Bold"/>
+            <TextBox Grid.Row="2" Grid.Column="1"
+                     Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}"
+                     Height="34"
+                     Margin="0,0,0,12"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0"
+                       Text="납품일시"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,12"
+                       FontWeight="Bold"/>
+            <DatePicker Grid.Row="3" Grid.Column="1"
+                        SelectedDate="{Binding DeliveryDate}"
+                        Height="34"
+                        Margin="0,0,0,12"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0"
+                       Text="품목명"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,12"
+                       FontWeight="Bold"/>
+            <ComboBox Grid.Row="4" Grid.Column="1"
+                      ItemsSource="{Binding ProductList}"
+                      SelectedItem="{Binding ProductName}"
+                      Height="34"
+                      Margin="0,0,0,12"/>
+
+            <TextBlock Grid.Row="5" Grid.Column="1"
+                       Text="{Binding CurrentStock, StringFormat=현재 재고: {0}개}"
+                       Foreground="#2563EB"
+                       FontWeight="Bold"
+                       Margin="0,0,0,12"/>
+
+            <TextBlock Grid.Row="6" Grid.Column="0"
+                       Text="수량"
+                       VerticalAlignment="Center"
+                       Margin="0,0,12,12"
+                       FontWeight="Bold"/>
+            <TextBox Grid.Row="6" Grid.Column="1"
+                     Text="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}"
+                     Height="34"
+                     Margin="0,0,0,12"/>
+
+            <TextBlock Grid.Row="7" Grid.Column="0"
+                       Text="메모"
+                       VerticalAlignment="Top"
+                       Margin="0,0,12,12"
+                       FontWeight="Bold"/>
+            
+            <TextBox Grid.Row="7" Grid.Column="1"
+                     Text="{Binding Memo, UpdateSourceTrigger=PropertyChanged}"
+                     Height="100"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     Margin="0,0,0,12"/>
+
+            <StackPanel Grid.Row="8" Grid.Column="1"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left">
+                <Button Content="저장"
+                        Width="120"
+                        Height="38"
+                        Margin="0,0,12,0"
+                        Command="{Binding SaveCommand}"/>
+
+                <Button Content="초기화"
+                        Width="120"
+                        Height="38"
+                        Command="{Binding ResetCommand}"/>
+
+                <TextBlock Text="{Binding StatusMessage}"
+                           VerticalAlignment="Center"
+                           Margin="16,0,0,0"
+                           Foreground="#475569"
+                           FontSize="13"/>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

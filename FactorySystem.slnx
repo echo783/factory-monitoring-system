@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FactoryApi/FactoryApi.csproj" />
+  <Project Path="FactoryClient/FactoryClient.csproj" />
+</Solution>

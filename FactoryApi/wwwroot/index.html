@@ -1,0 +1,864 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>카메라 ROI 디버그</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --line: #d7deea;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --blue: #2563eb;
+            --red: #ef4444;
+            --dark: #111827;
+            --green: #16a34a;
+            --amber: #d97706;
+            --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+            --radius: 14px;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .page {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px 20px;
+            margin-bottom: 18px;
+        }
+
+        .title {
+            margin: 0 0 10px 0;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .sub {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+            .toolbar label {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                background: #f8fafc;
+                border: 1px solid var(--line);
+                border-radius: 10px;
+                padding: 8px 10px;
+            }
+
+            .toolbar input[type="number"] {
+                width: 72px;
+                padding: 7px 8px;
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                font-size: 14px;
+            }
+
+        button {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+            button:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+        .btn-load {
+            background: var(--blue);
+            color: white;
+        }
+
+        .btn-save {
+            background: var(--dark);
+            color: white;
+        }
+
+        .btn-mode-object {
+            background: var(--blue);
+            color: white;
+        }
+
+        .btn-mode-label {
+            background: var(--red);
+            color: white;
+        }
+
+        .active-mode {
+            outline: 3px solid #fbbf24;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(760px, 1fr) 360px;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-head {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+            font-size: 17px;
+            font-weight: 700;
+            background: #fbfcfe;
+        }
+
+        .card-body {
+            padding: 14px;
+        }
+
+        .viewer-wrap {
+            width: 100%;
+            overflow: auto;
+            background: #0b1220;
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .canvas-wrap {
+            position: relative;
+            display: inline-block;
+            line-height: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+            visibility: hidden;
+        }
+
+            .canvas-wrap.ready {
+                visibility: visible;
+            }
+
+        #bgImage {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        #roiCanvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .side-stack {
+            display: grid;
+            gap: 18px;
+        }
+
+        .mono {
+            white-space: pre-wrap;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.65;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 12px;
+            min-height: 240px;
+            overflow: auto;
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .roi-summary {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eef2ff;
+            color: #1e3a8a;
+            border: 1px solid #c7d2fe;
+            border-radius: 999px;
+            padding: 7px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .save-status {
+            margin-top: 12px;
+            min-height: 24px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+            .save-status.idle {
+                color: var(--muted);
+            }
+
+            .save-status.saving {
+                color: var(--amber);
+            }
+
+            .save-status.ok {
+                color: var(--green);
+            }
+
+            .save-status.err {
+                color: var(--red);
+            }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page {
+                padding: 12px;
+            }
+
+            .title {
+                font-size: 22px;
+            }
+
+            .toolbar label {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <h1 class="title">카메라 ROI 디버그</h1>
+            <div class="sub">
+                박스 내부 드래그는 이동, 우하단 작은 사각형은 크기 조절입니다.
+                저장할 때는 화면 좌표를 원본 이미지 좌표로 자동 변환합니다.
+                이미지 크기가 바뀌어도 원본 ROI 기준으로 다시 계산하여 위치가 어긋나지 않게 했습니다.
+            </div>
+
+            <div class="toolbar">
+                <label>
+                    Camera ID
+                    <input type="number" id="cameraId" value="1" min="1" />
+                </label>
+
+                <button id="btnLoad" class="btn-load">불러오기</button>
+                <button id="btnModeObject" class="btn-mode-object active-mode">회전 ROI</button>
+                <button id="btnModeLabel" class="btn-mode-label">라벨 ROI</button>
+                <button id="btnSave" class="btn-save">ROI 저장</button>
+
+                <label><input type="checkbox" id="checkRotation" checked /> 회전 감지</label>
+                <label><input type="checkbox" id="checkLabel" checked /> 라벨 감지</label>
+            </div>
+
+            <div class="badge-row">
+                <div class="badge">파랑 = 회전 ROI</div>
+                <div class="badge">빨강 = 라벨 ROI</div>
+                <div class="badge">박스 내부 드래그 = 이동</div>
+                <div class="badge">우하단 핸들 드래그 = 크기조절</div>
+            </div>
+
+            <div id="saveStatus" class="save-status idle">준비됨</div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-head">실시간 영상 / ROI 편집</div>
+                <div class="card-body">
+                    <div class="viewer-wrap">
+                        <div class="canvas-wrap" id="canvasWrap">
+                            <img id="bgImage" alt="latest image" />
+                            <canvas id="roiCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="roi-summary">
+                        회전 ROI / 라벨 ROI 버튼으로 편집 대상을 바꾼 뒤, 화면 안에서 직접 이동하거나 크기를 조절해 주세요.
+                        ROI 값은 원본 좌표와 화면 좌표를 동시에 표시합니다.
+                    </div>
+                </div>
+            </div>
+
+            <div class="side-stack">
+                <div class="card">
+                    <div class="card-head">실시간 상태</div>
+                    <div class="card-body">
+                        <div id="stateText" class="mono"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-grid">
+            <div class="card">
+                <div class="card-head">ROI 값</div>
+                <div class="card-body">
+                    <div id="roiText" class="mono"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cameraIdEl = document.getElementById("cameraId");
+        const btnLoad = document.getElementById("btnLoad");
+        const btnSave = document.getElementById("btnSave");
+        const btnModeObject = document.getElementById("btnModeObject");
+        const btnModeLabel = document.getElementById("btnModeLabel");
+        const checkRotationEl = document.getElementById("checkRotation");
+        const checkLabelEl = document.getElementById("checkLabel");
+        const saveStatusEl = document.getElementById("saveStatus");
+
+        const bgImage = document.getElementById("bgImage");
+        const canvas = document.getElementById("roiCanvas");
+        const canvasWrap = document.getElementById("canvasWrap");
+        const ctx = canvas.getContext("2d");
+
+        const roiText = document.getElementById("roiText");
+        const stateText = document.getElementById("stateText");
+
+        let mode = "object";
+        let refreshBusy = false;
+        let saveBusy = false;
+        let activeAction = null; // move | resize
+        let dragRectStart = null;
+        let dragMouseStart = null;
+
+        const HANDLE_SIZE = 12;
+        const MIN_SIZE = 20;
+
+        // ✅ 원본 좌표(서버/DB 기준)
+        let objectRoiOriginal = { x: 50, y: 50, w: 200, h: 240 };
+        let labelRoiOriginal = { x: 120, y: 100, w: 90, h: 90 };
+
+        // ✅ 화면 표시 좌표(캔버스 기준)
+        let objectRoi = { x: 50, y: 50, w: 200, h: 240 };
+        let labelRoi = { x: 120, y: 100, w: 90, h: 90 };
+
+        function setSaveStatus(text, css) {
+            saveStatusEl.textContent = text;
+            saveStatusEl.className = `save-status ${css}`;
+        }
+
+        function getSelectedRect() {
+            return mode === "object" ? objectRoi : labelRoi;
+        }
+
+        function setSelectedRect(rect) {
+            if (mode === "object") objectRoi = rect;
+            else labelRoi = rect;
+        }
+
+        function setMode(nextMode) {
+            mode = nextMode;
+            btnModeObject.classList.toggle("active-mode", mode === "object");
+            btnModeLabel.classList.toggle("active-mode", mode === "label");
+            drawCanvas();
+        }
+
+        btnModeObject.addEventListener("click", () => setMode("object"));
+        btnModeLabel.addEventListener("click", () => setMode("label"));
+
+        function clamp(v, min, max) {
+            return Math.max(min, Math.min(max, v));
+        }
+
+        function clampRectToCanvas(rect) {
+            const maxW = canvas.width;
+            const maxH = canvas.height;
+
+            rect.w = clamp(rect.w, MIN_SIZE, Math.max(MIN_SIZE, maxW));
+            rect.h = clamp(rect.h, MIN_SIZE, Math.max(MIN_SIZE, maxH));
+
+            rect.x = clamp(rect.x, 0, Math.max(0, maxW - rect.w));
+            rect.y = clamp(rect.y, 0, Math.max(0, maxH - rect.h));
+
+            return rect;
+        }
+
+        function getHandleRect(rect) {
+            return {
+                x: rect.x + rect.w - HANDLE_SIZE,
+                y: rect.y + rect.h - HANDLE_SIZE,
+                w: HANDLE_SIZE,
+                h: HANDLE_SIZE
+            };
+        }
+
+        function pointInRect(x, y, rect) {
+            return x >= rect.x && x <= rect.x + rect.w &&
+                y >= rect.y && y <= rect.y + rect.h;
+        }
+
+        function drawSingleRect(rect, strokeColor, fillColor, title, selected) {
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = selected ? 3 : 2;
+            ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+            ctx.fillStyle = fillColor;
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+
+            ctx.fillStyle = strokeColor;
+            ctx.font = "bold 14px Arial";
+            ctx.fillText(title, rect.x + 6, Math.max(18, rect.y - 8));
+
+            if (selected) {
+                const h = getHandleRect(rect);
+                ctx.fillStyle = strokeColor;
+                ctx.fillRect(h.x, h.y, h.w, h.h);
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 1;
+                ctx.strokeRect(h.x, h.y, h.w, h.h);
+            }
+        }
+
+        function getDisplayScale() {
+            if (!bgImage.naturalWidth || !bgImage.naturalHeight || !canvas.width || !canvas.height) {
+                return { scaleX: 1, scaleY: 1 };
+            }
+
+            return {
+                scaleX: canvas.width / bgImage.naturalWidth,
+                scaleY: canvas.height / bgImage.naturalHeight
+            };
+        }
+
+        function toDisplayRect(srcRect) {
+            const { scaleX, scaleY } = getDisplayScale();
+
+            return {
+                x: Math.round(srcRect.x * scaleX),
+                y: Math.round(srcRect.y * scaleY),
+                w: Math.round(srcRect.w * scaleX),
+                h: Math.round(srcRect.h * scaleY)
+            };
+        }
+
+        function toOriginalRect(displayRect) {
+            const { scaleX, scaleY } = getDisplayScale();
+
+            return {
+                x: Math.round(displayRect.x / scaleX),
+                y: Math.round(displayRect.y / scaleY),
+                w: Math.round(displayRect.w / scaleX),
+                h: Math.round(displayRect.h / scaleY)
+            };
+        }
+
+        function syncDisplayRectsFromOriginal() {
+            objectRoi = toDisplayRect(objectRoiOriginal);
+            labelRoi = toDisplayRect(labelRoiOriginal);
+
+            objectRoi = clampRectToCanvas(objectRoi);
+            labelRoi = clampRectToCanvas(labelRoi);
+
+            drawCanvas();
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawSingleRect(
+                objectRoi,
+                "#2563eb",
+                "rgba(37,99,235,0.16)",
+                "ROTATION",
+                mode === "object"
+            );
+
+            drawSingleRect(
+                labelRoi,
+                "#ef4444",
+                "rgba(239,68,68,0.16)",
+                "LABEL",
+                mode === "label"
+            );
+
+            const objectOriginalNow = toOriginalRect(objectRoi);
+            const labelOriginalNow = toOriginalRect(labelRoi);
+
+            roiText.textContent =
+                `[회전 ROI - 화면 좌표]
+X = ${objectRoi.x}
+Y = ${objectRoi.y}
+W = ${objectRoi.w}
+H = ${objectRoi.h}
+
+[라벨 ROI - 화면 좌표]
+X = ${labelRoi.x}
+Y = ${labelRoi.y}
+W = ${labelRoi.w}
+H = ${labelRoi.h}
+
+[회전 ROI - 원본 좌표]
+X = ${objectOriginalNow.x}
+Y = ${objectOriginalNow.y}
+W = ${objectOriginalNow.w}
+H = ${objectOriginalNow.h}
+
+[라벨 ROI - 원본 좌표]
+X = ${labelOriginalNow.x}
+Y = ${labelOriginalNow.y}
+W = ${labelOriginalNow.w}
+H = ${labelOriginalNow.h}`;
+        }
+
+        function fitCanvasToImage() {
+            canvas.width = bgImage.clientWidth;
+            canvas.height = bgImage.clientHeight;
+
+            syncDisplayRectsFromOriginal();
+        }
+
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: Math.round(evt.clientX - rect.left),
+                y: Math.round(evt.clientY - rect.top)
+            };
+        }
+
+        function applyCursor(x, y) {
+            const rect = getSelectedRect();
+            const handle = getHandleRect(rect);
+
+            if (pointInRect(x, y, handle)) {
+                canvas.style.cursor = "nwse-resize";
+                return;
+            }
+
+            if (pointInRect(x, y, rect)) {
+                canvas.style.cursor = "move";
+                return;
+            }
+
+            canvas.style.cursor = "default";
+        }
+
+        canvas.addEventListener("mousedown", (e) => {
+            const p = getMousePos(e);
+            const rect = getSelectedRect();
+            const handle = getHandleRect(rect);
+
+            dragMouseStart = p;
+            dragRectStart = { ...rect };
+
+            if (pointInRect(p.x, p.y, handle)) {
+                activeAction = "resize";
+                return;
+            }
+
+            if (pointInRect(p.x, p.y, rect)) {
+                activeAction = "move";
+                return;
+            }
+
+            activeAction = null;
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+            const p = getMousePos(e);
+
+            if (!activeAction) {
+                applyCursor(p.x, p.y);
+                return;
+            }
+
+            let rect = { ...dragRectStart };
+
+            if (activeAction === "move") {
+                const dx = p.x - dragMouseStart.x;
+                const dy = p.y - dragMouseStart.y;
+
+                rect.x = dragRectStart.x + dx;
+                rect.y = dragRectStart.y + dy;
+
+                setSelectedRect(clampRectToCanvas(rect));
+                drawCanvas();
+                return;
+            }
+
+            if (activeAction === "resize") {
+                rect.w = Math.max(MIN_SIZE, dragRectStart.w + (p.x - dragMouseStart.x));
+                rect.h = Math.max(MIN_SIZE, dragRectStart.h + (p.y - dragMouseStart.y));
+
+                if (rect.x + rect.w > canvas.width) {
+                    rect.w = canvas.width - rect.x;
+                }
+                if (rect.y + rect.h > canvas.height) {
+                    rect.h = canvas.height - rect.y;
+                }
+
+                setSelectedRect(clampRectToCanvas(rect));
+                drawCanvas();
+                return;
+            }
+        });
+
+        window.addEventListener("mouseup", () => {
+            activeAction = null;
+            dragRectStart = null;
+            dragMouseStart = null;
+        });
+
+        window.addEventListener("resize", () => {
+            if (!bgImage.naturalWidth || !bgImage.naturalHeight) return;
+            fitCanvasToImage();
+        });
+
+        async function refreshImageOnly() {
+            const cameraId = Number(cameraIdEl.value);
+
+            await new Promise((resolve) => {
+                let done = false;
+
+                const finish = () => {
+                    if (done) return;
+                    done = true;
+                    resolve();
+                };
+
+                bgImage.onload = () => {
+                    fitCanvasToImage();
+                    canvasWrap.classList.add("ready");
+                    finish();
+                };
+
+                bgImage.onerror = () => finish();
+
+                bgImage.src = `/api/Camera/${cameraId}/image?t=${Date.now()}`;
+
+                setTimeout(finish, 1500);
+            });
+        }
+
+        async function loadConfig() {
+            const cameraId = Number(cameraIdEl.value);
+            const res = await fetch(`/api/Camera/${cameraId}/debug-config`);
+
+            if (!res.ok) {
+                setSaveStatus("debug-config 조회 실패", "err");
+                return;
+            }
+
+            const data = await res.json();
+
+            checkRotationEl.checked = data.checkRotation;
+            checkLabelEl.checked = data.checkLabel;
+
+            // ✅ 서버/DB 원본 좌표 저장
+            objectRoiOriginal = {
+                x: data.objectRoiX,
+                y: data.objectRoiY,
+                w: data.objectRoiW,
+                h: data.objectRoiH
+            };
+
+            labelRoiOriginal = {
+                x: data.labelRoiX,
+                y: data.labelRoiY,
+                w: data.labelRoiW,
+                h: data.labelRoiH
+            };
+
+            await refreshImageOnly();
+        }
+
+        function boolText(v) {
+            return v ? "TRUE" : "FALSE";
+        }
+
+        async function loadState() {
+            const cameraId = Number(cameraIdEl.value);
+            const res = await fetch(`/api/Camera/${cameraId}/debug-state`);
+
+            if (!res.ok) {
+                stateText.textContent = "debug-state 조회 실패";
+                return;
+            }
+
+            const s = await res.json();
+
+            stateText.textContent =
+                `RotationActive           : ${boolText(s.rotationActive)}
+LabelInZone              : ${boolText(s.labelInZone)}
+CountedInCurrentRotation : ${boolText(s.countedInCurrentRotation)}
+
+LastStarted              : ${boolText(s.lastStarted)}
+LastEnded                : ${boolText(s.lastEnded)}
+LastLabelEnter           : ${boolText(s.lastLabelEnter)}
+
+LastDetectorFound        : ${boolText(s.lastDetectorFound)}
+LastDetectorConfidence   : ${s.lastDetectorConfidence}
+
+LabelDetectedStreak      : ${s.labelDetectedStreak}
+LabelOffStreak           : ${s.labelOffStreak}
+
+LastRotationChangeValue  : ${s.lastRotationChangeValue}
+LastMotionRatio          : ${s.lastMotionRatio}
+LastLabelChangeValue     : ${s.lastLabelChangeValue}
+
+ProductionCount          : ${s.productionCount}
+
+LastFrameAt              : ${s.lastFrameAt}
+LastSuccessfulReadAt     : ${s.lastSuccessfulReadAt}
+LastReconnectAt          : ${s.lastReconnectAt}
+SessionStartedAt         : ${s.sessionStartedAt}
+LastUpdatedAt            : ${s.lastUpdatedAt}
+StreamJustReconnected    : ${boolText(s.streamJustReconnected)}`;
+        }
+
+        function validateRoi(rect, name) {
+            if (rect.w <= 0 || rect.h <= 0) {
+                setSaveStatus(`${name} ROI의 폭/높이가 0입니다.`, "err");
+                return false;
+            }
+            if (rect.w < MIN_SIZE || rect.h < MIN_SIZE) {
+                setSaveStatus(`${name} ROI가 너무 작습니다.`, "err");
+                return false;
+            }
+            return true;
+        }
+
+        async function saveRoi() {
+            if (saveBusy) return;
+
+            if (!validateRoi(objectRoi, "회전")) return;
+            if (!validateRoi(labelRoi, "라벨")) return;
+
+            saveBusy = true;
+            btnSave.disabled = true;
+            setSaveStatus("ROI 저장 중...", "saving");
+
+            try {
+                const cameraId = Number(cameraIdEl.value);
+
+                // ✅ 현재 화면 좌표를 원본 좌표로 갱신
+                objectRoiOriginal = toOriginalRect(objectRoi);
+                labelRoiOriginal = toOriginalRect(labelRoi);
+
+                const payload = {
+                    objectRoiX: objectRoiOriginal.x,
+                    objectRoiY: objectRoiOriginal.y,
+                    objectRoiW: objectRoiOriginal.w,
+                    objectRoiH: objectRoiOriginal.h,
+
+                    labelRoiX: labelRoiOriginal.x,
+                    labelRoiY: labelRoiOriginal.y,
+                    labelRoiW: labelRoiOriginal.w,
+                    labelRoiH: labelRoiOriginal.h,
+
+                    checkRotation: checkRotationEl.checked,
+                    checkLabel: checkLabelEl.checked
+                };
+
+                const res = await fetch(`/api/Camera/${cameraId}/roi`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    setSaveStatus("ROI 저장 실패", "err");
+                    return;
+                }
+
+                setSaveStatus("ROI 저장 완료", "ok");
+
+                await loadConfig();
+                await loadState();
+            } catch (e) {
+                console.error(e);
+                setSaveStatus("ROI 저장 중 오류 발생", "err");
+            } finally {
+                saveBusy = false;
+                btnSave.disabled = false;
+            }
+        }
+
+        btnLoad.addEventListener("click", async () => {
+            canvasWrap.classList.remove("ready");
+            setSaveStatus("설정 불러오는 중...", "saving");
+            await loadConfig();
+            await loadState();
+            setSaveStatus("불러오기 완료", "ok");
+        });
+
+        btnSave.addEventListener("click", saveRoi);
+
+        setInterval(async () => {
+            if (refreshBusy || saveBusy || activeAction) return;
+
+            refreshBusy = true;
+            try {
+                await refreshImageOnly();
+                await loadState();
+            } finally {
+                refreshBusy = false;
+            }
+        }, 1000);
+
+        (async function init() {
+            canvasWrap.classList.remove("ready");
+            setSaveStatus("초기 로딩 중...", "saving");
+            await loadConfig();
+            await loadState();
+            setSaveStatus("준비됨", "idle");
+        })();
+    </script>
+</body>
+</html>

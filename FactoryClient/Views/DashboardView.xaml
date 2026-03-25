@@ -1,0 +1,99 @@
+﻿<UserControl x:Class="FactoryClient.Views.DashboardView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="800" d:DesignWidth="1200">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 타이틀 -->
+        <StackPanel Margin="0,0,0,16">
+            <TextBlock Text="{Binding PageTitle}"
+                       FontSize="24"
+                       FontWeight="Bold"/>
+            <TextBlock Text="{Binding PageDescription}"
+                       FontSize="13"
+                       Foreground="Gray"
+                       Margin="0,6,0,0"/>
+        </StackPanel>
+
+        <!-- 카드 영역 -->
+        <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,16">
+
+            <Border Background="#EEF4FF" CornerRadius="10" Padding="16" Margin="6">
+                <StackPanel>
+                    <TextBlock Text="현재 생산량" Foreground="Gray"/>
+                    <TextBlock Text="{Binding ProductionCount}"
+                               FontSize="32"
+                               FontWeight="Bold"
+                               Foreground="Blue"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#ECFDF3" CornerRadius="10" Padding="16" Margin="6">
+                <StackPanel>
+                    <TextBlock Text="회전 감지" Foreground="Gray"/>
+                    <TextBlock Text="{Binding RotationText}"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="Green"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#FEF2F2" CornerRadius="10" Padding="16" Margin="6">
+                <StackPanel>
+                    <TextBlock Text="라벨 감지" Foreground="Gray"/>
+                    <TextBlock Text="{Binding LabelText}"
+                               FontSize="28"
+                               FontWeight="Bold"
+                               Foreground="Red"/>
+                </StackPanel>
+            </Border>
+
+        </UniformGrid>
+
+        <!-- 영상 + 상태 -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 영상 -->
+            <Border Grid.Column="0" Background="#F8FAFC" CornerRadius="10" Padding="12" Margin="6">
+                <StackPanel>
+                    <TextBlock Text="카메라 영상"
+                               FontWeight="Bold"
+                               Margin="0,0,0,12"/>
+
+                    <Border Background="Black" CornerRadius="8">
+                        <Image Source="{Binding CameraImage}"
+                               Height="450"
+                               Stretch="Uniform"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- 상태 -->
+            <Border Grid.Column="1" Background="#F8FAFC" CornerRadius="10" Padding="12" Margin="6">
+                <StackPanel>
+                    <TextBlock Text="상태"
+                               FontWeight="Bold"
+                               Margin="0,0,0,12"/>
+
+                    <TextBlock Text="{Binding DebugStateText}"
+                               FontFamily="Consolas"
+                               FontSize="13"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

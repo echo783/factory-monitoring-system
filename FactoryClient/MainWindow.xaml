@@ -1,0 +1,106 @@
+﻿<Window x:Class="FactoryClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Factory Monitor"
+        Height="900"
+        Width="1500"
+        WindowStartupLocation="CenterScreen"
+        Background="#F3F6FB">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#1F2937">
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Padding="20" Background="#111827">
+                    <StackPanel>
+                        <TextBlock Text="Factory Client"
+                                   Foreground="White"
+                                   FontSize="22"
+                                   FontWeight="Bold"/>
+                        <TextBlock Text="WPF Monitoring"
+                                   Foreground="#9CA3AF"
+                                   FontSize="13"
+                                   Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Margin="12">
+                    <Button x:Name="BtnDashboard"
+                            Content="대시보드"
+                            Height="48"
+                            Margin="0,8,0,0"
+                            Click="BtnDashboard_Click"/>
+
+                    <Button x:Name="BtnRoiDebug"
+                            Content="카메라 ROI 디버그"
+                            Height="48"
+                            Margin="0,8,0,0"
+                            Click="BtnRoiDebug_Click"/>
+
+                    <Button x:Name="BtnHistory"
+                            Content="생산 조회"
+                            Height="48"
+                            Margin="0,8,0,0"
+                            Click="BtnHistory_Click"/>
+
+                    <Button x:Name="BtnDeliveryCreate"
+                        Content="납품 등록"
+                        Height="48"
+                        Margin="0,8,0,0"
+                        Click="BtnDeliveryCreate_Click"/>
+
+                    <Button x:Name="BtnDeliveryList"
+                            Content="납품 조회"
+                            Height="48"
+                            Margin="0,8,0,0"
+                            Click="BtnDeliveryList_Click"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="20"
+                    BorderBrush="#D6DCE8"
+                    BorderThickness="1">
+                <DockPanel>
+                    <StackPanel>
+                        <TextBlock x:Name="TxtPageTitle"
+                                   Text="대시보드"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="#111827"/>
+                        <TextBlock x:Name="TxtPageDesc"
+                                   Text="실시간 카메라 상태와 생산 카운트를 확인합니다."
+                                   FontSize="13"
+                                   Foreground="#6B7280"
+                                   Margin="0,6,0,0"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Row="1"
+                    Margin="0,16,0,0"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="20"
+                    BorderBrush="#D6DCE8"
+                    BorderThickness="1">
+                <ContentControl x:Name="MainContent"/>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
