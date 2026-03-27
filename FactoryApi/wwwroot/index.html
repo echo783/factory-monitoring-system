@@ -288,7 +288,7 @@
             <div class="sub">
                 박스 내부 드래그는 이동, 우하단 작은 사각형은 크기 조절입니다.
                 저장할 때는 화면 좌표를 원본 이미지 좌표로 자동 변환합니다.
-                이미지 크기가 바뀌어도 원본 ROI 기준으로 다시 계산하여 위치가 어긋나지 않게 했습니다.
+                ROI를 수정한 뒤 저장 전까지는 자동 새로고침이 ROI 위치를 덮어쓰지 않도록 처리했습니다.
             </div>
 
             <div class="toolbar">
@@ -311,6 +311,7 @@
                 <div class="badge">빨강 = 라벨 ROI</div>
                 <div class="badge">박스 내부 드래그 = 이동</div>
                 <div class="badge">우하단 핸들 드래그 = 크기조절</div>
+                <div class="badge">수정 후 저장 전 자동 갱신 정지</div>
             </div>
 
             <div id="saveStatus" class="save-status idle">준비됨</div>
@@ -328,7 +329,7 @@
                     </div>
                     <div class="roi-summary">
                         회전 ROI / 라벨 ROI 버튼으로 편집 대상을 바꾼 뒤, 화면 안에서 직접 이동하거나 크기를 조절해 주세요.
-                        ROI 값은 원본 좌표와 화면 좌표를 동시에 표시합니다.
+                        ROI를 수정하면 저장 전까지 자동 새로고침은 상태값만 갱신하고 ROI 위치는 유지합니다.
                     </div>
                 </div>
             </div>
@@ -377,15 +378,16 @@
         let activeAction = null; // move | resize
         let dragRectStart = null;
         let dragMouseStart = null;
+        let roiDirty = false; // 저장 전 ROI 수정 여부
 
         const HANDLE_SIZE = 12;
         const MIN_SIZE = 20;
 
-        // ✅ 원본 좌표(서버/DB 기준)
+        // 서버/DB 원본 좌표
         let objectRoiOriginal = { x: 50, y: 50, w: 200, h: 240 };
         let labelRoiOriginal = { x: 120, y: 100, w: 90, h: 90 };
 
-        // ✅ 화면 표시 좌표(캔버스 기준)
+        // 현재 화면 표시 좌표
         let objectRoi = { x: 50, y: 50, w: 200, h: 240 };
         let labelRoi = { x: 120, y: 100, w: 90, h: 90 };
 
@@ -399,8 +401,11 @@
         }
 
         function setSelectedRect(rect) {
-            if (mode === "object") objectRoi = rect;
-            else labelRoi = rect;
+            if (mode === "object") {
+                objectRoi = rect;
+            } else {
+                labelRoi = rect;
+            }
         }
 
         function setMode(nextMode) {
@@ -500,12 +505,8 @@
         }
 
         function syncDisplayRectsFromOriginal() {
-            objectRoi = toDisplayRect(objectRoiOriginal);
-            labelRoi = toDisplayRect(labelRoiOriginal);
-
-            objectRoi = clampRectToCanvas(objectRoi);
-            labelRoi = clampRectToCanvas(labelRoi);
-
+            objectRoi = clampRectToCanvas(toDisplayRect(objectRoiOriginal));
+            labelRoi = clampRectToCanvas(toDisplayRect(labelRoiOriginal));
             drawCanvas();
         }
 
@@ -554,14 +555,45 @@ H = ${objectOriginalNow.h}
 X = ${labelOriginalNow.x}
 Y = ${labelOriginalNow.y}
 W = ${labelOriginalNow.w}
-H = ${labelOriginalNow.h}`;
+H = ${labelOriginalNow.h}
+
+[편집 상태]
+roiDirty = ${roiDirty}`;
         }
 
-        function fitCanvasToImage() {
+        function fitCanvasToImage(keepCurrentRect = true) {
+            const oldWidth = canvas.width || 1;
+            const oldHeight = canvas.height || 1;
+
+            const prevObject = { ...objectRoi };
+            const prevLabel = { ...labelRoi };
+
             canvas.width = bgImage.clientWidth;
             canvas.height = bgImage.clientHeight;
 
-            syncDisplayRectsFromOriginal();
+            if (!keepCurrentRect || oldWidth <= 1 || oldHeight <= 1) {
+                syncDisplayRectsFromOriginal();
+                return;
+            }
+
+            const scaleX = canvas.width / oldWidth;
+            const scaleY = canvas.height / oldHeight;
+
+            objectRoi = clampRectToCanvas({
+                x: Math.round(prevObject.x * scaleX),
+                y: Math.round(prevObject.y * scaleY),
+                w: Math.round(prevObject.w * scaleX),
+                h: Math.round(prevObject.h * scaleY)
+            });
+
+            labelRoi = clampRectToCanvas({
+                x: Math.round(prevLabel.x * scaleX),
+                y: Math.round(prevLabel.y * scaleY),
+                w: Math.round(prevLabel.w * scaleX),
+                h: Math.round(prevLabel.h * scaleY)
+            });
+
+            drawCanvas();
         }
 
         function getMousePos(evt) {
@@ -628,6 +660,8 @@ H = ${labelOriginalNow.h}`;
                 rect.y = dragRectStart.y + dy;
 
                 setSelectedRect(clampRectToCanvas(rect));
+                roiDirty = true;
+                setSaveStatus("ROI 수정됨 - 저장 필요", "saving");
                 drawCanvas();
                 return;
             }
@@ -644,6 +678,8 @@ H = ${labelOriginalNow.h}`;
                 }
 
                 setSelectedRect(clampRectToCanvas(rect));
+                roiDirty = true;
+                setSaveStatus("ROI 수정됨 - 저장 필요", "saving");
                 drawCanvas();
                 return;
             }
@@ -657,7 +693,7 @@ H = ${labelOriginalNow.h}`;
 
         window.addEventListener("resize", () => {
             if (!bgImage.naturalWidth || !bgImage.naturalHeight) return;
-            fitCanvasToImage();
+            fitCanvasToImage(true);
         });
 
         async function refreshImageOnly() {
@@ -673,7 +709,7 @@ H = ${labelOriginalNow.h}`;
                 };
 
                 bgImage.onload = () => {
-                    fitCanvasToImage();
+                    fitCanvasToImage(true);
                     canvasWrap.classList.add("ready");
                     finish();
                 };
@@ -700,7 +736,6 @@ H = ${labelOriginalNow.h}`;
             checkRotationEl.checked = data.checkRotation;
             checkLabelEl.checked = data.checkLabel;
 
-            // ✅ 서버/DB 원본 좌표 저장
             objectRoiOriginal = {
                 x: data.objectRoiX,
                 y: data.objectRoiY,
@@ -716,6 +751,9 @@ H = ${labelOriginalNow.h}`;
             };
 
             await refreshImageOnly();
+            syncDisplayRectsFromOriginal();
+            roiDirty = false;
+            drawCanvas();
         }
 
         function boolText(v) {
@@ -759,7 +797,10 @@ LastSuccessfulReadAt     : ${s.lastSuccessfulReadAt}
 LastReconnectAt          : ${s.lastReconnectAt}
 SessionStartedAt         : ${s.sessionStartedAt}
 LastUpdatedAt            : ${s.lastUpdatedAt}
-StreamJustReconnected    : ${boolText(s.streamJustReconnected)}`;
+StreamJustReconnected    : ${boolText(s.streamJustReconnected)}
+
+roiDirty                 : ${boolText(roiDirty)}
+activeAction             : ${activeAction ?? "-"}`;
         }
 
         function validateRoi(rect, name) {
@@ -787,7 +828,6 @@ StreamJustReconnected    : ${boolText(s.streamJustReconnected)}`;
             try {
                 const cameraId = Number(cameraIdEl.value);
 
-                // ✅ 현재 화면 좌표를 원본 좌표로 갱신
                 objectRoiOriginal = toOriginalRect(objectRoi);
                 labelRoiOriginal = toOriginalRect(labelRoi);
 
@@ -817,6 +857,7 @@ StreamJustReconnected    : ${boolText(s.streamJustReconnected)}`;
                     return;
                 }
 
+                roiDirty = false;
                 setSaveStatus("ROI 저장 완료", "ok");
 
                 await loadConfig();
@@ -827,6 +868,7 @@ StreamJustReconnected    : ${boolText(s.streamJustReconnected)}`;
             } finally {
                 saveBusy = false;
                 btnSave.disabled = false;
+                drawCanvas();
             }
         }
 
@@ -841,7 +883,12 @@ StreamJustReconnected    : ${boolText(s.streamJustReconnected)}`;
         btnSave.addEventListener("click", saveRoi);
 
         setInterval(async () => {
-            if (refreshBusy || saveBusy || activeAction) return;
+            if (refreshBusy || saveBusy || activeAction || roiDirty) {
+                if (roiDirty && !saveBusy && !activeAction) {
+                    await loadState();
+                }
+                return;
+            }
 
             refreshBusy = true;
             try {
