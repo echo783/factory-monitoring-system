@@ -1,7 +1,7 @@
 ﻿using FactoryApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FactoryApi.Data
+namespace FactoryApi.Infrastructure.Persistence
 {
     public class FactoryDbContext : DbContext
     {

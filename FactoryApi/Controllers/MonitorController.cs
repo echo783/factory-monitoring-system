@@ -1,5 +1,5 @@
-﻿using FactoryApi.Models;
-using FactoryApi.Services.CameraRuntime;
+﻿using FactoryApi.Infrastructure.CameraRuntime;
+using FactoryApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FactoryApi.Controllers

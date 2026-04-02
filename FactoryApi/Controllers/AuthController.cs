@@ -1,5 +1,6 @@
-﻿using FactoryApi.Dtos.Auth;
-using FactoryApi.Services.Auth;
+﻿using FactoryApi.Contracts.Requests.Auth;
+using FactoryApi.Contracts.Responses.Auth;
+using FactoryApi.Infrastructure.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FactoryApi.Controllers

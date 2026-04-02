@@ -1,9 +1,8 @@
 ﻿using System.Data;
 using Dapper;
-using FactoryApi.Data;
 using FactoryApi.Models;
 
-namespace FactoryApi.Repositories
+namespace FactoryApi.Infrastructure.Persistence
 {
     public class DeliveryRepository
     {

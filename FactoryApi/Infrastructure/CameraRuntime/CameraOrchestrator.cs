@@ -1,7 +1,8 @@
-﻿using FactoryApi.Data;
+﻿using FactoryApi.Infrastructure.Persistence;
+using FactoryApi.Services.CameraRuntime;
 using Microsoft.EntityFrameworkCore;
 
-namespace FactoryApi.Services.CameraRuntime
+namespace FactoryApi.Infrastructure.CameraRuntime
 {
     public sealed class CameraOrchestrator : BackgroundService
     {

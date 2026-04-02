@@ -1,13 +1,13 @@
-using FactoryApi.Data;
 using FactoryApi.Hubs;
-using FactoryApi.Repositories;
-using FactoryApi.Services;
 using FactoryApi.Services.CameraRuntime;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using FactoryApi.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using FactoryApi.Infrastructure.Auth;
+using FactoryApi.Infrastructure.CameraRuntime;
+using FactoryApi.Infrastructure.MediaMtx;
+using FactoryApi.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

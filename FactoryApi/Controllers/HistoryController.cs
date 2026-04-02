@@ -1,4 +1,4 @@
-﻿using FactoryApi.Data;
+﻿using FactoryApi.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

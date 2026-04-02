@@ -1,6 +1,6 @@
-﻿using FactoryApi.Data;
-using Dapper;
+﻿using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using FactoryApi.Infrastructure.Persistence;
 
 namespace FactoryApi.Controllers
 {

@@ -1,11 +1,11 @@
-﻿using FactoryApi.Data;
-using FactoryApi.Models;
-using FactoryApi.Services.CameraRuntime;
+﻿using FactoryApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FactoryApi.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
+using FactoryApi.Infrastructure.CameraRuntime;
+using FactoryApi.Infrastructure.Persistence;
 
 namespace FactoryApi.Controllers
 {

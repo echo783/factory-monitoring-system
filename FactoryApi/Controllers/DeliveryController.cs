@@ -1,5 +1,5 @@
-﻿using FactoryApi.Models;
-using FactoryApi.Repositories;
+﻿using FactoryApi.Infrastructure.Persistence;
+using FactoryApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FactoryApi.Controllers

@@ -1,4 +1,4 @@
-﻿namespace FactoryApi.Services
+﻿namespace FactoryApi.Infrastructure.MediaMtx
 {
     public class MediaMtxOptions
     {

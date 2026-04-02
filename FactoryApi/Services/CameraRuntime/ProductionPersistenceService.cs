@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using FactoryApi.Data;
 using FactoryApi.Models;
+using FactoryApi.Infrastructure.Persistence;
 
 namespace FactoryApi.Services.CameraRuntime
 {

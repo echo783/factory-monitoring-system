@@ -1,10 +1,10 @@
-﻿using FactoryApi.Data;
+﻿using FactoryApi.Infrastructure.Persistence;
 using FactoryApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Text;
 
-namespace FactoryApi.Services
+namespace FactoryApi.Infrastructure.MediaMtx
 {
     public sealed class MediaMtxConfigWriter
     {

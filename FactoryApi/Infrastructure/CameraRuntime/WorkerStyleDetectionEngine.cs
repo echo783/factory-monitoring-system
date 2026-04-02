@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FactoryApi.Services.CameraRuntime;
+using Microsoft.Extensions.Logging;
 using OpenCvSharp;
 
-namespace FactoryApi.Services.CameraRuntime
+namespace FactoryApi.Infrastructure.CameraRuntime
 {
     public sealed class WorkerStyleDetectionEngine
     {

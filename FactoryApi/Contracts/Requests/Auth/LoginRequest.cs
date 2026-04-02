@@ -1,4 +1,4 @@
-﻿namespace FactoryApi.Dtos.Auth
+﻿namespace FactoryApi.Contracts.Requests.Auth
 {
     public class LoginRequest
     {

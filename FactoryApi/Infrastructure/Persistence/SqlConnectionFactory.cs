@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Microsoft.Data.SqlClient;
 
-namespace FactoryApi.Data
+namespace FactoryApi.Infrastructure.Persistence
 {
     public class SqlConnectionFactory
     {

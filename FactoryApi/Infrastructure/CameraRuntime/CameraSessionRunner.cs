@@ -1,7 +1,8 @@
 ﻿using FactoryApi.Models;
+using FactoryApi.Services.CameraRuntime;
 using OpenCvSharp;
 
-namespace FactoryApi.Services.CameraRuntime
+namespace FactoryApi.Infrastructure.CameraRuntime
 {
     public sealed class CameraSessionRunner : IAsyncDisposable
     {

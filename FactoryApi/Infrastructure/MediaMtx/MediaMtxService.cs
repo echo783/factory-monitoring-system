@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Options;
 
-namespace FactoryApi.Services
+namespace FactoryApi.Infrastructure.MediaMtx
 {
     public class MediaMtxService : BackgroundService
     {
