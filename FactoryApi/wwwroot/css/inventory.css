@@ -1,0 +1,37 @@
+/* inventory.css - page-specific layout only
+   Common controls (buttons, inputs, cards, titles) are provided by common-layout.css
+   This file keeps only inventory page layout, summary cards and responsive rules.
+*/
+
+.inventory-page { display: grid; gap: 16px; }
+
+/* hero card container: keep min-height but visual styles handled by common layout */
+.inventory-hero-card { min-height: 140px; }
+
+/* Filter layout */
+.inventory-filter { margin-top: 12px; display: grid; grid-template-columns: minmax(240px, 360px) auto auto; gap: 12px; align-items: end; }
+.inventory-field { display:flex; flex-direction:column; gap:6px; }
+.inventory-field__label { font-size:13px; color:#475467; font-weight:700; }
+.inventory-actions { display:flex; gap:8px; align-items:center; }
+
+/* loading indicator kept minimal (visual from common layout) */
+.loading { font-weight:700; color:#2563eb; }
+
+/* result card container */
+.inventory-result-card { min-height: 160px; }
+.inventory-result-head { margin-bottom: 10px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.result-message { color:#6b7280; }
+
+.inv-result { display:grid; gap:14px; }
+
+/* summary grid and cards */
+.inventory-summary { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px; }
+.summary-card { border:1px solid #e6eef8; border-radius:12px; background:#f8fafc; padding:12px 14px; }
+.summary-card--accent { background: linear-gradient(180deg,#eff6ff 0%,#dbeafe 100%); border-color:#bfdbfe; }
+.summary-card__label { font-size:13px; font-weight:700; color:#667085; margin-bottom:8px; }
+.summary-card__value { font-size:20px; font-weight:800; color:#0f172a; word-break:break-word; }
+.summary-card__value--qty { color:#1d4ed8; font-size:28px; line-height:1; }
+
+/* responsive adjustments */
+@media (max-width:1024px) { .inventory-filter { grid-template-columns:1fr; align-items:stretch; } .inventory-summary { grid-template-columns:1fr; } }
+@media (max-width:768px) { .inventory-actions { width:100%; } .summary-card__value { font-size:18px; } .summary-card__value--qty { font-size:24px; } }

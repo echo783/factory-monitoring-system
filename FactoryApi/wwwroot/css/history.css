@@ -1,0 +1,56 @@
+/* history.css - page-specific layout and table styles only
+   Common controls (buttons, inputs, cards, headings) should be provided by common-layout.css
+   This file keeps only history page layout, table, modal and responsive behavior.
+*/
+
+/* Page layout */
+.history-page { height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 16px; }
+
+/* Filter card placement */
+.history-filter-card { margin-bottom: 0; /* keep filter visually above results */
+    position: relative; z-index: 40; }
+.history-filter-card .card-head { margin-bottom: 8px; }
+
+/* Filter row grid: compact and stable */
+.history-filter-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+.history-field { display:flex; flex-direction:column; gap:6px; }
+.history-field__label { font-size:13px; color:var(--muted); }
+
+/* ensure dropdowns in filter are above result card (avoid being clipped) */
+.history-filter-row select,
+.history-filter-row .select-base {
+    position: relative;
+    z-index: 60;
+}
+
+/* Actions placement only - visual styles come from common-layout.css */
+.history-actions { display:flex; gap:8px; align-items:center; }
+
+/* Results card structure */
+.history-results-card { display:flex; flex-direction:column; min-height:0; position: relative; z-index: 10; }
+.results-header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; }
+.results-count { font-weight:700; }
+.loading { color:var(--primary); font-weight:700; }
+
+/* Table container and sticky header */
+.table-wrap { flex:1 1 auto; min-height:0; overflow:auto; border:1px solid var(--border); border-radius:10px; background:var(--surface); position:relative; z-index: 1; }
+.events-table { width:100%; border-collapse:separate; table-layout:fixed; min-width:720px; }
+.events-table thead th { position:sticky; top:0; z-index:2; background:var(--surface); padding:10px 12px; text-align:left; font-weight:700; border-bottom:1px solid var(--border); white-space:nowrap; }
+.events-table tbody td { padding:10px 12px; border-bottom:1px solid rgba(0,0,0,0.04); font-size:13px; vertical-align:middle; overflow:hidden; }
+.events-table tbody tr:hover { background: rgba(37,99,235,0.03); }
+.events-table tbody tr:last-child td { border-bottom:none; }
+
+.empty-state { padding:12px; color:var(--muted); text-align:center; border-radius:8px; }
+
+/* Snapshot thumbnail and modal (page-specific) */
+.snapshot-thumb { width:120px; height:70px; object-fit:cover; border-radius:6px; border:1px solid var(--border); cursor:pointer; }
+.snapshot-modal[hidden] { display:none !important; }
+.snapshot-modal { position:fixed; inset:0; z-index:3000; display:flex; align-items:center; justify-content:center; padding:20px; }
+.snapshot-modal__backdrop { position:absolute; inset:0; background:rgba(15,23,42,0.55); }
+.snapshot-modal__dialog { position:relative; width:min(960px, calc(100vw - 40px)); max-height:calc(100vh - 40px); margin:20px auto; background:var(--surface); border-radius:12px; box-shadow:0 24px 60px rgba(15,23,42,0.28); padding:20px; overflow:auto; }
+.snapshot-modal__close { position:absolute; top:12px; right:12px; }
+.snapshot-modal__body img { display:block; max-width:100%; max-height:calc(100vh - 140px); object-fit:contain; border-radius:8px; }
+
+/* Responsive: collapse filter columns on smaller screens */
+@media (max-width:900px) { .history-filter-row { grid-template-columns: 1fr 1fr; } .history-actions { grid-column:1/-1; } }
+@media (max-width:760px) { .history-filter-row { grid-template-columns:1fr; } .events-table { min-width:600px; } }

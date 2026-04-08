@@ -1,22 +1,21 @@
-﻿const accessToken = localStorage.getItem("accessToken");
-const username = localStorage.getItem("username");
+const accessToken = localStorage.getItem("accessToken");
 let cameraId = 1;
 
-const userInfoEl = document.getElementById("userInfo");
-const secureUserInfoEl = document.getElementById("secureUserInfo");
-const cameraStatusEl = document.getElementById("cameraStatus");
-const tokenExpireEl = document.getElementById("token-expire");
-const tokenStatusEl = document.getElementById("token-status");
 const cameraSelectEl = document.getElementById("cameraSelect");
-const hubStateBadgeEl = document.getElementById("hubStateBadge");
 const eventLogEl = document.getElementById("eventLog");
+
 const btnStartEl = document.getElementById("btnStart");
 const btnStopEl = document.getElementById("btnStop");
-const btnStatusEl = document.getElementById("btnStatus");
-const kpiCameraNameEl = document.getElementById("kpiCameraName");
-const kpiCameraStatusEl = document.getElementById("kpiCameraStatus");
-const kpiHubStateEl = document.getElementById("kpiHubState");
-const kpiLastUpdatedEl = document.getElementById("kpiLastUpdated");
+const btnQuickPrevEl = document.getElementById("btnQuickPrev");
+const btnQuickNextEl = document.getElementById("btnQuickNext");
+
+const cameraStatusEl = document.getElementById("cameraStatus");
+
+const liveBadgeEl = document.getElementById("liveBadge");
+const liveNameEl = document.getElementById("liveName");
+const liveIdEl = document.getElementById("liveId");
+const liveMsgEl = document.getElementById("liveMsg");
+
 let signalRConnection = null;
 let joinedCameraGroupId = null;
 const MAX_EVENT_LOG = 20;
@@ -50,109 +49,14 @@ async function handleUnauthorized(res) {
     return false;
 }
 
-function goRoi() {
-    location.href = `/roi.html?cameraId=${cameraId}`;
+function formatLocalDateTime(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+    return date.toLocaleString();
 }
 
-function logout() {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("username");
-    localStorage.removeItem("expiresAt");
-    redirectToLogin();
-}
 
-async function checkAuth() {
-    if (!ensureLoggedIn()) return;
-
-    try {
-        const res = await fetch("/api/secure/me", {
-            method: "GET",
-            headers: authHeaders()
-        });
-
-        if (await handleUnauthorized(res)) return;
-
-        if (!res.ok) {
-            alert("인증 실패");
-            return;
-        }
-
-        const data = await res.json();
-        alert(`${data.message} / 사용자: ${data.username}`);
-    } catch (error) {
-        console.error(error);
-        alert("인증 확인 중 오류가 발생했습니다.");
-    }
-}
-
-async function loadSecureUserInfo() {
-    if (!ensureLoggedIn()) return;
-    if (!secureUserInfoEl) return;
-
-    try {
-        const res = await fetch("/api/secure/me", {
-            method: "GET",
-            headers: authHeaders()
-        });
-
-        if (await handleUnauthorized(res)) return;
-
-        if (!res.ok) {
-            secureUserInfoEl.innerText = "사용자 정보를 불러오지 못했습니다.";
-            return;
-        }
-
-        const data = await res.json();
-        secureUserInfoEl.innerText = `운영자: ${data.username}`;
-    } catch (error) {
-        console.error(error);
-        secureUserInfoEl.innerText = "사용자 정보 조회 중 오류가 발생했습니다.";
-    }
-}
-
-function pushEventLog(message) {
-    if (!(eventLogEl instanceof HTMLElement)) return;
-
-    const item = document.createElement("li");
-    item.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-    eventLogEl.prepend(item);
-
-    while (eventLogEl.childElementCount > MAX_EVENT_LOG) {
-        eventLogEl.removeChild(eventLogEl.lastElementChild);
-    }
-}
-
-function setHubState(state) {
-    if (state === "connected") {
-        if (hubStateBadgeEl instanceof HTMLElement) {
-            hubStateBadgeEl.textContent = "Connected";
-            hubStateBadgeEl.className = "status-badge status--running";
-        }
-        if (kpiHubStateEl instanceof HTMLElement) {
-            kpiHubStateEl.textContent = "Connected";
-        }
-        return;
-    }
-
-    if (state === "reconnecting") {
-        if (hubStateBadgeEl instanceof HTMLElement) {
-            hubStateBadgeEl.textContent = "Reconnecting";
-            hubStateBadgeEl.className = "status-badge status--warn";
-        }
-        if (kpiHubStateEl instanceof HTMLElement) {
-            kpiHubStateEl.textContent = "Reconnecting";
-        }
-        return;
-    }
-
-    if (hubStateBadgeEl instanceof HTMLElement) {
-        hubStateBadgeEl.textContent = "Disconnected";
-        hubStateBadgeEl.className = "status-badge status--error";
-    }
-    if (kpiHubStateEl instanceof HTMLElement) {
-        kpiHubStateEl.textContent = "Disconnected";
-    }
-}
 
 function setButtonBusy(button, isBusy, busyText) {
     if (!(button instanceof HTMLButtonElement)) return;
@@ -173,24 +77,48 @@ function setButtonBusy(button, isBusy, busyText) {
     button.textContent = button.dataset.originalText || button.textContent || "";
 }
 
+function pushEventLog(message) {
+    if (!(eventLogEl instanceof HTMLElement)) return;
+
+    const item = document.createElement("li");
+    item.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+    eventLogEl.prepend(item);
+
+    while (eventLogEl.childElementCount > MAX_EVENT_LOG) {
+        eventLogEl.removeChild(eventLogEl.lastElementChild);
+    }
+}
+
+function updateDashboard(data) {
+    if (liveNameEl) liveNameEl.textContent = data.cameraName || "-";
+    if (liveIdEl) liveIdEl.textContent = "ID: " + (data.cameraId || "-");
+
+    if (liveBadgeEl) {
+        const status = (data.status || "-").toString();
+        liveBadgeEl.textContent = status;
+        liveBadgeEl.className = "status-pill";
+        if (status === "Running") {
+            liveBadgeEl.classList.add("status-pill--running");
+        } else if (status === "Stopped") {
+            liveBadgeEl.classList.add("status-pill--stopped");
+        } else {
+            liveBadgeEl.classList.add("status-pill--neutral");
+        }
+    }
+
+    if (liveMsgEl) liveMsgEl.textContent = data.message || "-";
+}
+
 function renderCameraStatus(data) {
     if (!cameraStatusEl) return;
 
     const status = data.status || "Unknown";
-    const statusClass = status === "Running"
-        ? "status--running"
-        : status === "Stopped"
-            ? "status--stopped"
-            : status === "Error"
-                ? "status--error"
-                : "status--warn";
-
     const changedAt = formatLocalDateTime(data.changedAt);
 
-    cameraStatusEl.innerHTML =
-        `<div class="camera-status__header">
+    cameraStatusEl.innerHTML = `
+        <div class="camera-status__header">
             <span class="camera-status__label">상태</span>
-            <span class="status-badge ${statusClass}">${status}</span>
+            <span class="status-badge ${status === "Running" ? "status--running" : status === "Stopped" ? "status--stopped" : status === "Error" ? "status--error" : "status--warn"}">${status}</span>
         </div>
         <div class="camera-status__meta">
             <div class="camera-status__meta-item">
@@ -212,27 +140,10 @@ function renderCameraStatus(data) {
         </div>
         <div class="camera-status__message">
             <strong>Message:</strong> ${data.message}
-        </div>`;
+        </div>
+    `;
 
-    if (kpiCameraNameEl instanceof HTMLElement) {
-        kpiCameraNameEl.textContent = data.cameraName || "-";
-    }
-    if (kpiCameraStatusEl instanceof HTMLElement) {
-        kpiCameraStatusEl.textContent = status;
-        kpiCameraStatusEl.className = `status-badge ${statusClass}`;
-    }
-    if (kpiLastUpdatedEl instanceof HTMLElement) {
-        kpiLastUpdatedEl.textContent = changedAt;
-    }
-}
-
-function formatLocalDateTime(value) {
-    if (!value) return "-";
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "-";
-
-    return date.toLocaleString();
+    updateDashboard(data);
 }
 
 function renderCameraOptions(cameras) {
@@ -245,6 +156,18 @@ function renderCameraOptions(cameras) {
         option.textContent = `${cam.cameraName} (${cam.cameraId}) - ${cam.enabled ? "사용중" : "비활성"}`;
         cameraSelectEl.appendChild(option);
     });
+
+}
+
+function selectCameraByIndex(nextIndex) {
+    if (!(cameraSelectEl instanceof HTMLSelectElement)) return;
+    const opts = cameraSelectEl.options;
+    if (!opts || opts.length === 0) return;
+
+    const idx = Math.max(0, Math.min(nextIndex, opts.length - 1));
+    cameraSelectEl.selectedIndex = idx;
+    cameraId = Number(cameraSelectEl.value) || cameraId;
+    cameraSelectEl.dispatchEvent(new Event("change"));
 }
 
 async function ensureSignalRScriptLoaded() {
@@ -259,9 +182,50 @@ async function ensureSignalRScriptLoaded() {
     });
 }
 
+function setHubState(state) {
+    if (typeof window.updateGlobalHubState === "function") {
+        if (state === "connected") {
+            window.updateGlobalHubState("connected", "Connected");
+        } else if (state === "reconnecting") {
+            window.updateGlobalHubState("reconnecting", "Reconnecting");
+        } else {
+            window.updateGlobalHubState("disconnected", "Disconnected");
+        }
+    }
+
+    if (state === "reconnecting") {
+        if (btnStartEl) btnStartEl.disabled = true;
+        if (btnStopEl) btnStopEl.disabled = true;
+        return;
+    }
+
+    if (state === "connected") {
+        if (btnStartEl) btnStartEl.disabled = false;
+        if (btnStopEl) btnStopEl.disabled = false;
+        return;
+    }
+
+    if (btnStartEl) btnStartEl.disabled = true;
+    if (btnStopEl) btnStopEl.disabled = true;
+}
+
+async function switchCameraGroup(nextCameraId) {
+    if (!signalRConnection) return;
+    if (signalRConnection.state !== "Connected") return;
+    if (joinedCameraGroupId === nextCameraId) return;
+
+    if (joinedCameraGroupId !== null) {
+        pushEventLog(`그룹 이탈: camera-${joinedCameraGroupId}`);
+        await signalRConnection.invoke("LeaveCameraGroup", joinedCameraGroupId);
+    }
+
+    pushEventLog(`그룹 가입: camera-${nextCameraId}`);
+    await signalRConnection.invoke("JoinCameraGroup", nextCameraId);
+    joinedCameraGroupId = nextCameraId;
+}
+
 async function connectCameraStatusHub() {
     if (!ensureLoggedIn()) return;
-    if (!cameraStatusEl) return;
 
     try {
         await ensureSignalRScriptLoaded();
@@ -288,15 +252,11 @@ async function connectCameraStatusHub() {
         signalRConnection.onreconnecting(() => {
             setHubState("reconnecting");
             pushEventLog("SignalR 재연결 시도 중");
-            if (cameraStatusEl) {
-                cameraStatusEl.textContent = "실시간 연결 재시도 중...";
-            }
         });
 
-        signalRConnection.onreconnected(() => {
-            console.log(`[SignalR] reconnected. rejoin camera-${cameraId}`);
-            switchCameraGroup(cameraId);
-            loadCameraStatus();
+        signalRConnection.onreconnected(async () => {
+            await switchCameraGroup(cameraId);
+            await loadCameraStatus();
             setHubState("connected");
             pushEventLog("SignalR 재연결 완료");
         });
@@ -314,30 +274,7 @@ async function connectCameraStatusHub() {
         console.error(error);
         setHubState("disconnected");
         pushEventLog("SignalR 연결 실패");
-        if (cameraStatusEl) {
-            cameraStatusEl.textContent = "실시간 연결 실패 (기존 조회 기능은 사용 가능)";
-        }
     }
-}
-
-async function switchCameraGroup(nextCameraId) {
-    if (!signalRConnection) return;
-    if (signalRConnection.state !== "Connected") return;
-
-    if (joinedCameraGroupId === nextCameraId) return;
-
-    if (joinedCameraGroupId !== null) {
-        console.log(`[SignalR] LeaveCameraGroup start: camera-${joinedCameraGroupId}`);
-        pushEventLog(`그룹 이탈: camera-${joinedCameraGroupId}`);
-        await signalRConnection.invoke("LeaveCameraGroup", joinedCameraGroupId);
-        console.log(`[SignalR] LeaveCameraGroup done: camera-${joinedCameraGroupId}`);
-    }
-
-    console.log(`[SignalR] JoinCameraGroup start: camera-${nextCameraId}`);
-    pushEventLog(`그룹 가입: camera-${nextCameraId}`);
-    await signalRConnection.invoke("JoinCameraGroup", nextCameraId);
-    console.log(`[SignalR] JoinCameraGroup done: camera-${nextCameraId}`);
-    joinedCameraGroupId = nextCameraId;
 }
 
 async function loadCameraOptions() {
@@ -351,35 +288,42 @@ async function loadCameraOptions() {
         });
 
         if (await handleUnauthorized(res)) return;
-
-        if (!res.ok) {
-            cameraStatusEl.textContent = "카메라 목록을 불러오지 못했습니다.";
-            return;
-        }
+        if (!res.ok) return;
 
         const cameras = await res.json();
-
-        if (!Array.isArray(cameras) || cameras.length === 0) {
-            cameraStatusEl.textContent = "등록된 카메라가 없습니다.";
-            return;
-        }
+        if (!Array.isArray(cameras) || cameras.length === 0) return;
 
         renderCameraOptions(cameras);
 
         const hasSelected = cameras.some((cam) => Number(cam.cameraId) === selectedCameraId);
-        cameraId = hasSelected
-            ? selectedCameraId
-            : (Number(cameras[0].cameraId) || 1);
+        cameraId = hasSelected ? selectedCameraId : (Number(cameras[0].cameraId) || 1);
         cameraSelectEl.value = String(cameraId);
     } catch (error) {
         console.error(error);
-        cameraStatusEl.textContent = "카메라 목록 조회 중 오류가 발생했습니다.";
+    }
+}
+
+async function loadCameraStatus(fromButton = false) {
+    if (!ensureLoggedIn()) return;
+
+
+    try {
+        const res = await fetch(`/api/Camera/${cameraId}/status`, {
+            headers: authHeaders()
+        });
+
+        if (await handleUnauthorized(res)) return;
+        if (!res.ok) return;
+
+        const data = await res.json();
+        renderCameraStatus(data);
+    } catch (error) {
+        console.error(error);
     }
 }
 
 async function startCamera() {
     if (!ensureLoggedIn()) return;
-    if (!cameraStatusEl) return;
     setButtonBusy(btnStartEl, true, "시작 중");
 
     try {
@@ -389,25 +333,11 @@ async function startCamera() {
         });
 
         if (await handleUnauthorized(res)) return;
-        if (res.status === 404) {
-            cameraStatusEl.textContent = "선택한 카메라가 등록되어 있지 않습니다.";
-            pushEventLog(`카메라 ${cameraId} 시작 실패: 미등록 카메라`);
-            return;
-        }
-
-        if (!res.ok) {
-            cameraStatusEl.textContent = "카메라 시작 실패";
-            pushEventLog(`카메라 ${cameraId} 시작 실패`);
-            return;
-        }
-
-        cameraStatusEl.textContent = "카메라 시작 요청 성공";
-        pushEventLog(`카메라 ${cameraId} 시작 요청 성공`);
+        pushEventLog(res.ok ? `카메라 ${cameraId} 시작 요청 성공` : `카메라 ${cameraId} 시작 실패`);
         await loadCameraOptions();
         await loadCameraStatus();
     } catch (error) {
         console.error(error);
-        cameraStatusEl.textContent = "카메라 시작 중 오류가 발생했습니다.";
         pushEventLog(`카메라 ${cameraId} 시작 오류`);
     } finally {
         setButtonBusy(btnStartEl, false);
@@ -416,7 +346,6 @@ async function startCamera() {
 
 async function stopCamera() {
     if (!ensureLoggedIn()) return;
-    if (!cameraStatusEl) return;
     setButtonBusy(btnStopEl, true, "중지 중");
 
     try {
@@ -426,107 +355,21 @@ async function stopCamera() {
         });
 
         if (await handleUnauthorized(res)) return;
-        if (res.status === 404) {
-            cameraStatusEl.textContent = "선택한 카메라가 등록되어 있지 않습니다.";
-            pushEventLog(`카메라 ${cameraId} 중지 실패: 미등록 카메라`);
-            return;
-        }
-
-        if (!res.ok) {
-            cameraStatusEl.textContent = "카메라 중지 실패";
-            pushEventLog(`카메라 ${cameraId} 중지 실패`);
-            return;
-        }
-
-        cameraStatusEl.textContent = "카메라 중지 요청 성공";
-        pushEventLog(`카메라 ${cameraId} 중지 요청 성공`);
+        pushEventLog(res.ok ? `카메라 ${cameraId} 중지 요청 성공` : `카메라 ${cameraId} 중지 실패`);
         await loadCameraOptions();
         await loadCameraStatus();
     } catch (error) {
         console.error(error);
-        cameraStatusEl.textContent = "카메라 중지 중 오류가 발생했습니다.";
         pushEventLog(`카메라 ${cameraId} 중지 오류`);
     } finally {
         setButtonBusy(btnStopEl, false);
     }
 }
 
-async function loadCameraStatus(fromButton = false) {
+document.addEventListener("DOMContentLoaded", async () => {
     if (!ensureLoggedIn()) return;
 
-    if (!cameraStatusEl) {
-        console.warn("cameraStatus 요소를 찾을 수 없습니다.");
-        return;
-    }
-
-    if (fromButton) {
-        setButtonBusy(btnStatusEl, true, "조회 중");
-    }
-
-    try {
-        const res = await fetch(`/api/Camera/${cameraId}/status`, {
-            headers: authHeaders()
-        });
-
-        if (await handleUnauthorized(res)) return;
-        if (res.status === 404) {
-            cameraStatusEl.textContent = "선택한 카메라가 등록되어 있지 않습니다.";
-            pushEventLog(`카메라 ${cameraId} 상태 조회 실패: 미등록 카메라`);
-            return;
-        }
-
-        if (!res.ok) {
-            cameraStatusEl.textContent = "카메라 상태 조회 실패";
-            pushEventLog(`카메라 ${cameraId} 상태 조회 실패`);
-            return;
-        }
-
-        const data = await res.json();
-        renderCameraStatus(data);
-    } catch (error) {
-        console.error(error);
-        cameraStatusEl.textContent = "카메라 상태 조회 중 오류 발생";
-        pushEventLog(`카메라 ${cameraId} 상태 조회 오류`);
-    } finally {
-        if (fromButton) {
-            setButtonBusy(btnStatusEl, false);
-        }
-    }
-}
-
-function copyAccessToken() {
-    const copiedToken = localStorage.getItem("accessToken");
-
-    if (!copiedToken) {
-        alert("AccessToken 없음");
-        return;
-    }
-
-    navigator.clipboard.writeText(copiedToken)
-        .then(() => {
-            if (tokenStatusEl) {
-                tokenStatusEl.innerText = "AccessToken 복사 완료!";
-            }
-        })
-        .catch((error) => {
-            console.error(error);
-            alert("복사 실패");
-        });
-}
-
-window.addEventListener("DOMContentLoaded", async () => {
-    if (!ensureLoggedIn()) return;
-
-    if (userInfoEl) {
-        userInfoEl.innerText = `운영자: ${username || "admin"}`;
-    }
-
-    const expiresAt = localStorage.getItem("expiresAt");
-    if (expiresAt && tokenExpireEl) {
-        tokenExpireEl.innerText = "만료시간: " + expiresAt;
-    }
-
-    if (cameraSelectEl instanceof HTMLSelectElement) {
+    if (cameraSelectEl) {
         cameraSelectEl.addEventListener("change", async () => {
             cameraId = Number(cameraSelectEl.value) || 1;
             await switchCameraGroup(cameraId);
@@ -534,7 +377,11 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    await loadSecureUserInfo();
+    if (btnStartEl) btnStartEl.addEventListener("click", startCamera);
+    if (btnStopEl) btnStopEl.addEventListener("click", stopCamera);
+    if (btnQuickPrevEl) btnQuickPrevEl.addEventListener("click", () => selectCameraByIndex(cameraSelectEl.selectedIndex - 1));
+    if (btnQuickNextEl) btnQuickNextEl.addEventListener("click", () => selectCameraByIndex(cameraSelectEl.selectedIndex + 1));
+
     setHubState("reconnecting");
     await loadCameraOptions();
     await connectCameraStatusHub();

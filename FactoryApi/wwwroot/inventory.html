@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>재고 조회</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="/css/common-layout.css" />
+    <link rel="stylesheet" href="/css/inventory.css" />
+</head>
+<body>
+    <div class="app-shell">
+        <div id="app-header"></div>
+
+        <main class="page-shell">
+            <section class="inventory-page">
+                <section class="card inventory-hero-card">
+                    <div class="card-head">
+                        <div>
+                            <h2 class="page-title">재고 조회</h2>
+                            <p class="page-desc">제품을 선택하여 현재 재고를 빠르게 확인합니다.</p>
+                        </div>
+                    </div>
+
+                    <div class="inventory-filter">
+                        <label class="inventory-field" for="productSelect">
+                            <span class="inventory-field__label">제품</span>
+                            <select id="productSelect" class="select-base">
+                                <option value="">선택하세요</option>
+                            </select>
+                        </label>
+
+                        <div class="inventory-actions">
+                            <button id="btnCheck" class="btn-primary" type="button">조회</button>
+                            <button id="btnClear" class="btn-secondary" type="button">초기화</button>
+                        </div>
+
+                        <div id="invLoading" class="loading" hidden>로딩 중...</div>
+                    </div>
+                </section>
+
+                <section class="card inventory-result-card">
+                    <div class="card-head">
+                        <div>
+                            <h3 class="section-title">조회 결과</h3>
+                            <div id="invMessage" class="page-desc">제품을 선택하고 조회하세요.</div>
+                        </div>
+                    </div>
+
+                    <div id="invResult" class="inv-result" hidden>
+                        <div class="inventory-summary">
+                            <div class="summary-card">
+                                <div class="summary-card__label">제품명</div>
+                                <div id="resName" class="summary-card__value">-</div>
+                            </div>
+
+                            <div class="summary-card summary-card--accent">
+                                <div class="summary-card__label">현재 재고</div>
+                                <div id="resQty" class="summary-card__value summary-card__value--qty">-</div>
+                            </div>
+
+                            <div class="summary-card">
+                                <div class="summary-card__label">조회 시각</div>
+                                <div id="resTime" class="summary-card__value">-</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </section>
+        </main>
+
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="/js/common-layout.js"></script>
+    <script src="/js/inventory.js"></script>
+</body>
+</html>

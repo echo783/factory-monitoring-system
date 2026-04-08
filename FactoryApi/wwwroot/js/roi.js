@@ -446,7 +446,7 @@ async function loadConfig() {
         if (await handleUnauthorized(res)) return;
 
         if (!res.ok) {
-            setSaveStatus("debug-config 조회 실패", "err");
+            setSaveStatus("설정 정보를 불러오지 못했습니다.", "err");
             return;
         }
 
@@ -476,7 +476,7 @@ async function loadConfig() {
         drawCanvas();
     } catch (error) {
         console.error(error);
-        setSaveStatus("debug-config 조회 중 오류 발생", "err");
+        setSaveStatus("설정 조회 중 오류가 발생했습니다.", "err");
     }
 }
 
@@ -495,7 +495,7 @@ async function loadState() {
         if (await handleUnauthorized(res)) return;
 
         if (!res.ok) {
-            stateText.textContent = "debug-state 조회 실패";
+            stateText.textContent = "상태 정보를 불러오지 못했습니다.";
             return;
         }
 
@@ -533,7 +533,7 @@ roiDirty                 : ${boolText(roiDirty)}
 activeAction             : ${activeAction ?? "-"}`;
     } catch (error) {
         console.error(error);
-        stateText.textContent = "debug-state 조회 중 오류 발생";
+        stateText.textContent = "상태 조회 중 오류가 발생했습니다.";
     }
 }
 
@@ -639,6 +639,9 @@ setInterval(async () => {
 }, 1000);
 
 (async function init() {
+    if (window.updateGlobalHubState) {
+        window.updateGlobalHubState("connected", "ROI Ready");
+    }
     canvasWrap.classList.remove("ready");
     setSaveStatus("초기 로딩 중...", "saving");
     await loadConfig();

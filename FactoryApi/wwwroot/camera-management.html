@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>카메라 관리</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link rel="stylesheet" href="/css/common-layout.css" />
+    <link rel="stylesheet" href="/css/index.css" />
+    <link rel="stylesheet" href="/css/camera-management.css" />
+</head>
+<body>
+    <div class="app-shell">
+        <div id="app-header"></div>
+
+        <main class="page-shell">
+            <section class="dashboard camera-page">
+                <!-- New camera quick form (compact) -->
+                <section id="newCard" class="card new-card">
+                    <div class="card-head">
+                        <div>
+                            <h2 class="page-title">신규 카메라 등록</h2>
+                            <p class="page-desc">새 카메라를 빠르게 등록합니다.</p>
+                        </div>
+                    </div>
+
+                    <form id="newForm" class="form-grid single-line-form">
+                        <label>
+                            <span>CameraName</span>
+                            <input id="inName" class="input-base" type="text" required />
+                        </label>
+
+                        <label>
+                            <span>RtspUrl</span>
+                            <input id="inRtsp" class="input-base" type="text" required />
+                        </label>
+
+                        <label>
+                            <span>ProductName</span>
+                            <input id="inProduct" class="input-base" type="text" />
+                        </label>
+
+                        <label>
+                            <span>Enabled</span>
+                            <select id="inEnabled" class="select-base">
+                                <option value="true">사용</option>
+                                <option value="false">비활성</option>
+                            </select>
+                        </label>
+
+                        <div class="form-actions inline-actions">
+                            <button type="submit" id="btnSave" class="btn-primary">저장</button>
+                            <button type="button" id="btnCancel" class="btn-secondary">초기화</button>
+                        </div>
+
+                        <div id="formMsg" class="meta-text form-msg"></div>
+                    </form>
+                </section>
+
+                <!-- Camera list -->
+                <section class="camera-list card">
+                    <div class="card-head">
+                        <div>
+                            <h3 class="section-title">카메라 목록</h3>
+                            <p class="page-desc">행을 클릭하면 카메라 상세를 확인할 수 있습니다.</p>
+                        </div>
+                        <div>
+                            <!-- actions removed: refresh and new buttons are handled elsewhere if needed -->
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table id="cameraTable" class="events-table compact-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-id">ID</th>
+                                    <th class="col-name">이름</th>
+                                    <th class="col-product">제품명</th>
+                                    <th class="col-enabled">사용</th>
+                                    <th class="col-rtsp">RTSP URL</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <div id="listEmpty" class="empty-state" hidden>
+                        등록된 카메라가 없습니다.
+                    </div>
+                </section>
+            </section>
+        </main>
+
+        <!-- Detail modal -->
+        <div id="cameraDetailModal" class="modal-backdrop" hidden>
+            <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="cameraDetailTitle">
+                <div class="modal-head">
+                    <div>
+                        <h3 id="cameraDetailTitle" class="section-title">카메라 상세</h3>
+                        <p class="page-desc">선택한 카메라의 등록 정보를 확인합니다.</p>
+                    </div>
+                    <button id="btnCloseDetail" class="modal-close" type="button" aria-label="닫기">×</button>
+                </div>
+
+                <dl class="detail-dl modal-detail-dl">
+                    <div><dt>ID</dt><dd id="detailId">-</dd></div>
+                    <div><dt>이름</dt><dd id="detailName">-</dd></div>
+                    <div><dt>RTSP</dt><dd id="detailRtsp">-</dd></div>
+                    <div><dt>제품명</dt><dd id="detailProduct">-</dd></div>
+                    <div><dt>Enabled</dt><dd id="detailEnabled">-</dd></div>
+                </dl>
+
+                <div class="modal-actions">
+                    <button id="btnDeleteCamera" class="btn-secondary" type="button">삭제</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="app-footer"></div>
+    </div>
+
+    <script src="/js/common-layout.js"></script>
+    <script src="/js/camera-management.js"></script>
+</body>
+</html>

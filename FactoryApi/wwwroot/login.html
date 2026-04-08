@@ -4,28 +4,44 @@
     <meta charset="UTF-8">
     <title>운영자 로그인</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="/css/index.css" />
+    <link rel="stylesheet" href="/css/common-layout.css" />
     <link rel="stylesheet" href="/css/login.css" />
 </head>
 <body>
-    <main class="login-page">
-        <section class="login-card" aria-label="운영자 로그인">
-            <h1 class="login-title">운영자 로그인</h1>
-            <p class="login-subtitle">Factory API 운영 대시보드에 접속합니다.</p>
+    <div class="app-shell">
+        <main class="page-shell">
+            <div class="login-center">
+                <section class="card login-card" aria-label="운영자 로그인">
+                    <div class="card-head">
+                        <div>
+                            <h1 class="page-title">운영자 로그인</h1>
+                            <p class="page-desc">Factory API 운영 대시보드에 접속합니다.</p>
+                        </div>
+                    </div>
 
-            <label class="login-label" for="username">아이디</label>
-            <input type="text" id="username" class="login-input" placeholder="아이디" autocomplete="username">
+                    <form id="loginForm" class="form-vertical" onsubmit="login(); return false;">
+                        <label class="form-row">
+                            <span class="form-label">아이디</span>
+                            <input type="text" id="username" class="input-base" placeholder="아이디" autocomplete="username" />
+                        </label>
 
-            <label class="login-label" for="password">비밀번호</label>
-            <input type="password" id="password" class="login-input" placeholder="비밀번호" autocomplete="current-password">
+                        <label class="form-row">
+                            <span class="form-label">비밀번호</span>
+                            <input type="password" id="password" class="input-base" placeholder="비밀번호" autocomplete="current-password" />
+                        </label>
 
-            <div id="loginError" class="login-error" role="status" aria-live="polite" hidden>
-                로그인 정보를 다시 확인해 주세요.
+                        <div id="loginMessage" class="form-message login-error" role="status" aria-live="polite" hidden>
+                            로그인 정보를 다시 확인해 주세요.
+                        </div>
+
+                        <div class="form-actions">
+                            <button id="loginBtn" type="button" class="btn-primary" onclick="login()">로그인</button>
+                        </div>
+                    </form>
+                </section>
             </div>
-
-            <button id="loginButton" class="login-button" onclick="login()">로그인</button>
-        </section>
-    </main>
+        </main>
+    </div>
 
     <script src="/js/login.js"></script>
 </body>
