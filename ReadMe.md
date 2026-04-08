@@ -31,12 +31,13 @@ RTSP 카메라 스트림을 분석하여
 ---
 
 ## Architecture
-'''Controller → Application → Infrastructure
-'''↓
-'''Camera Runtime (OpenCV)
-'''↓
-'''MSSQL
 
+```text
+Controller → Application → Infrastructure
+                      ↓
+               Camera Runtime (OpenCV)
+                      ↓
+                  MSSQL
 
 - API 중심 구조로 웹 UI 및 외부 시스템과 확장 가능
 - 런타임 영상 처리와 비즈니스 로직 분리
