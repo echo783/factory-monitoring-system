@@ -113,6 +113,29 @@ docs
 
 ---
 
+## External Dependency (MediaMTX)
+
+본 프로젝트는 RTSP 스트림 처리를 위해 MediaMTX가 필요합니다.
+아래 경로에 실행 파일을 위치시켜 주세요:
+FactoryApi/tools/mediamtx/
+
+필수 파일:
+- mediamtx.exe
+
+다운로드:
+https://drive.google.com/file/d/1MmPli1E5Jfl-LgpTdv6rewxB1XXXY1VW/view?usp=drive_link
+
+---
+
+This project requires MediaMTX for RTSP stream handling.
+Place the executable file in the following path:
+FactoryApi/tools/mediamtx/
+
+Required file:
+- mediamtx.exe
+- 
+---
+
 ## Portfolio
 
 - Factory Monitoring Portfolio PDF  
