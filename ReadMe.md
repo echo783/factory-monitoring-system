@@ -38,7 +38,7 @@ Controller → Application → Infrastructure
                Camera Runtime (OpenCV)
                       ↓
                   MSSQL
-
+```
 - API 중심 구조로 웹 UI 및 외부 시스템과 확장 가능
 - 런타임 영상 처리와 비즈니스 로직 분리
 - DTO 기반 요청/응답 모델 분리
