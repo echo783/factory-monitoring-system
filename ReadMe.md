@@ -134,7 +134,7 @@ rtsp://admin:chan1324!@cksdnr7979223.iptime.org:8554/Streaming/Channels/101
 ## Portfolio
 
 - Factory Monitoring Portfolio PDF  
-  docs/JeongChanwook_Factory_Monitoring_Portfolio.pdf
+  docs/Factory Monitoring Portfolio.pdf
 
 
 
