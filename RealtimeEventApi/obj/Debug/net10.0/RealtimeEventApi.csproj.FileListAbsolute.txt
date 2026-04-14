@@ -203,3 +203,4 @@ D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\refint\RealtimeEven
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\RealtimeEventApi.pdb
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\RealtimeEventApi.genruntimeconfig.cache
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\ref\RealtimeEventApi.dll
+D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\RealtimeEventApi.sourcelink.json

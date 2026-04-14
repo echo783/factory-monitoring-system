@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RealtimeEventApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+85b4b5af0649921d5a2aec5003ac01e209819378")]
 [assembly: System.Reflection.AssemblyProductAttribute("RealtimeEventApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RealtimeEventApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
