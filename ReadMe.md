@@ -2,8 +2,9 @@
 
 > RTSP 기반 영상 데이터를 실시간 이벤트로 변환하여 API로 제공하는 시스템
 
-RTSP 기반 실시간 영상 분석 및 이벤트 처리 시스템  
-(C#, ASP.NET Core, SignalR, OpenCV, MSSQL)
+RTSP 기반 실시간 영상 분석 및 이벤트 처리 시스템입니다.  
+C#, ASP.NET Core, SignalR, OpenCV, MSSQL 기반으로 구성했으며,  
+영상 데이터 → 이벤트 → 상태 → API → 웹 UI 흐름을 중심으로 설계했습니다.
 
 ---
 
@@ -76,7 +77,7 @@ Controller → Application → Infrastructure
 
 ## Project Structure
 ```text
-FactoryApi
+RealtimeEventApi
 ├─ Controllers
 ├─ Application
 ├─ Contracts
@@ -115,9 +116,8 @@ docs
 
 ## External Dependency (MediaMTX)
 
-본 프로젝트는 RTSP 스트림 처리를 위해 MediaMTX가 필요합니다.
-아래 경로에 실행 파일을 위치시켜 주세요:
-FactoryApi/tools/mediamtx/
+MediaMTX 실행 파일을 별도 준비 후
+RealtimeEventApi/tools/mediamtx/ 경로에 배치해야 합니다.
 
 필수 파일:
 - mediamtx.exe
