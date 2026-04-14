@@ -1,4 +1,4 @@
-# Factory Monitoring System
+# realtime-event-api
 
 > RTSP 기반 영상 데이터를 실시간 이벤트로 변환하여 API로 제공하는 시스템
 
