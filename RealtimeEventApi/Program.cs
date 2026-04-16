@@ -1,4 +1,6 @@
+using FactoryApi.Application.Ai;
 using FactoryApi.Hubs;
+using FactoryApi.Infrastructure.Ai;
 using FactoryApi.Infrastructure.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +14,9 @@ builder.Services.AddAuthServices(builder.Configuration);
 builder.Services.AddCameraApplication();
 builder.Services.AddCameraRuntime();
 builder.Services.AddMonitor();
+
+//python vision client 설정
+builder.Services.AddAiServices(builder.Configuration);
 
 builder.Services.AddMediaMtx(builder.Configuration);
 

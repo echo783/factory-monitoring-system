@@ -1,7 +1,128 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "D:\\Dev\\realtime-event-api\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\wwwroot\\css\\roi.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\wwwroot\\css\\roi.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\wwwroot\\js\\roi.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\wwwroot\\js\\roi.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\wwwroot\\roi.html||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\wwwroot\\roi.html||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\controllers\\cameracontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\controllers\\cameracontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\ai\\cameraroivalidationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\ai\\cameraroivalidationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\ai\\pythonvalidateroiresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\ai\\pythonvalidateroiresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\ai\\cameraroivalidationresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\ai\\cameraroivalidationresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\ai\\pythonvalidateroirequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\ai\\pythonvalidateroirequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\ai\\pythonvisionclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\ai\\pythonvisionclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\dependencyinjection\\servicecollectionextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\dependencyinjection\\servicecollectionextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\cameracommandservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\cameracommandservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\cameraruntime\\workerstyledetectionengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\cameraruntime\\workerstyledetectionengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\cameraruntime\\icameraruntimereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\cameraruntime\\icameraruntimereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\cameraruntime\\detectedlabelresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\cameraruntime\\detectedlabelresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\cameraruntime\\camerasessionstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\cameraruntime\\camerasessionstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\cameraruntime\\camerasessionrunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\cameraruntime\\camerasessionrunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\cameraruntime\\cameraorchestrator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\cameraruntime\\cameraorchestrator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\camerasummaryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\camerasummaryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\dtos\\camerasummaryinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\dtos\\camerasummaryinput.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\persistence\\productionpersistenceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\persistence\\productionpersistenceservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\infrastructure\\persistence\\sqlconnectionfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\infrastructure\\persistence\\sqlconnectionfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\cameraqueryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\cameraqueryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\dtos\\cameraroiresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\dtos\\cameraroiresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\dtos\\cameraimageresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\dtos\\cameraimageresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\dtos\\cameradebugconfigresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\dtos\\cameradebugconfigresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\dtos\\addcameraresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\dtos\\addcameraresult.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\camera\\cameraimageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\camera\\cameraimageservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|d:\\dev\\realtime-event-api\\realtimeeventapi\\application\\monitor\\monitorqueryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D725D5A3-A075-34AF-3FDC-6665BFCE08C0}|RealtimeEventApi\\RealtimeEventApi.csproj|solutionrelative:realtimeeventapi\\application\\monitor\\monitorqueryservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +130,384 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{6324226f-61b6-4f28-92ee-18d4b5fe1e48}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "roi.css",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\wwwroot\\css\\roi.css",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\wwwroot\\css\\roi.css",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\wwwroot\\css\\roi.css",
+              "RelativeToolTip": "RealtimeEventApi\\wwwroot\\css\\roi.css",
+              "ViewState": "AgIAABEBAAAAAAAAAADgvx4BAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-04-16T06:53:06.473Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "CameraRoiValidationResult.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Ai\\CameraRoiValidationResult.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Ai\\CameraRoiValidationResult.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Ai\\CameraRoiValidationResult.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Ai\\CameraRoiValidationResult.cs",
+              "ViewState": "AgIAAAoAAAAAAAAAAAAmwBYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T04:52:51.416Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CameraRoiValidationService.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Ai\\CameraRoiValidationService.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Ai\\CameraRoiValidationService.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Ai\\CameraRoiValidationService.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Ai\\CameraRoiValidationService.cs",
+              "ViewState": "AgIAAEgAAAAAAAAAAAAlwFMAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T04:40:41.038Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CameraController.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Controllers\\CameraController.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Controllers\\CameraController.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Controllers\\CameraController.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Controllers\\CameraController.cs",
+              "ViewState": "AgIAAOYAAAAAAAAAAAAUwPMAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T06:01:57.087Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "roi.js",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\wwwroot\\js\\roi.js",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\wwwroot\\js\\roi.js",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\wwwroot\\js\\roi.js",
+              "RelativeToolTip": "RealtimeEventApi\\wwwroot\\js\\roi.js",
+              "ViewState": "AgIAAGYCAAAAAAAAAAAAwHcCAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-04-16T05:57:15.849Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "PythonValidateRoiRequest.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Ai\\PythonValidateRoiRequest.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Ai\\PythonValidateRoiRequest.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Ai\\PythonValidateRoiRequest.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Ai\\PythonValidateRoiRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T04:52:58.766Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "roi.html",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\wwwroot\\roi.html",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\wwwroot\\roi.html",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\wwwroot\\roi.html",
+              "RelativeToolTip": "RealtimeEventApi\\wwwroot\\roi.html",
+              "ViewState": "AgIAAEUAAAAAAAAAAAAawE0AAAA6AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
+              "WhenOpened": "2026-04-16T05:40:18.162Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PythonValidateRoiResponse.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Ai\\PythonValidateRoiResponse.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Ai\\PythonValidateRoiResponse.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Ai\\PythonValidateRoiResponse.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Ai\\PythonValidateRoiResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T06:23:41.605Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "PythonVisionClient.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\Ai\\PythonVisionClient.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\Ai\\PythonVisionClient.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\Ai\\PythonVisionClient.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\Ai\\PythonVisionClient.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAuwC8AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T04:02:49.979Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "ServiceCollectionExtensions.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\DependencyInjection\\ServiceCollectionExtensions.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\DependencyInjection\\ServiceCollectionExtensions.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\DependencyInjection\\ServiceCollectionExtensions.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\DependencyInjection\\ServiceCollectionExtensions.cs",
+              "ViewState": "AgIAAFkAAAAAAAAAAADwv2EAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T05:02:35.14Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Program.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Program.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Program.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Program.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAQwBIAAAA2AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-16T04:57:44.867Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "CameraCommandService.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\CameraCommandService.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\CameraCommandService.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\CameraCommandService.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\CameraCommandService.cs",
+              "ViewState": "AgIAAE8AAAAAAAAAAADwv10AAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:29:53.813Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "ICameraRuntimeReader.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\ICameraRuntimeReader.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\ICameraRuntimeReader.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\ICameraRuntimeReader.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\ICameraRuntimeReader.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwIAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T06:00:49.362Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Properties\\launchSettings.json",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Properties\\launchSettings.json",
+              "RelativeToolTip": "RealtimeEventApi\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-16T04:06:22.416Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "DetectedLabelResult.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\DetectedLabelResult.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\DetectedLabelResult.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\DetectedLabelResult.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\DetectedLabelResult.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T06:00:42.121Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "CameraSessionState.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraSessionState.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraSessionState.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraSessionState.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraSessionState.cs",
+              "ViewState": "AgIAAFQAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T06:00:20.478Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "CameraSessionRunner.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraSessionRunner.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraSessionRunner.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraSessionRunner.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraSessionRunner.cs",
+              "ViewState": "AgIAADgBAAAAAAAAAAAiwEIBAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:57:13.04Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "WorkerStyleDetectionEngine.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\WorkerStyleDetectionEngine.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\WorkerStyleDetectionEngine.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\WorkerStyleDetectionEngine.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\WorkerStyleDetectionEngine.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwUAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T06:01:10.33Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "CameraOrchestrator.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraOrchestrator.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraOrchestrator.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraOrchestrator.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\CameraRuntime\\CameraOrchestrator.cs",
+              "ViewState": "AgIAAN0AAAAAAAAAAAAkwBUAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:56:37.648Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "CameraSummaryService.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\CameraSummaryService.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\CameraSummaryService.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\CameraSummaryService.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\CameraSummaryService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:54:54.533Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "SqlConnectionFactory.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\Persistence\\SqlConnectionFactory.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\Persistence\\SqlConnectionFactory.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\Persistence\\SqlConnectionFactory.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\Persistence\\SqlConnectionFactory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:42:01.37Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "ProductionPersistenceService.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\Persistence\\ProductionPersistenceService.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Infrastructure\\Persistence\\ProductionPersistenceService.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Infrastructure\\Persistence\\ProductionPersistenceService.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Infrastructure\\Persistence\\ProductionPersistenceService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:41:59.612Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "CameraSummaryInput.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\CameraSummaryInput.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\Dtos\\CameraSummaryInput.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\CameraSummaryInput.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\Dtos\\CameraSummaryInput.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAqwBwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:30:34.316Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "CameraQueryService.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\CameraQueryService.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\CameraQueryService.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\CameraQueryService.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\CameraQueryService.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:29:59.925Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "AddCameraResult.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\AddCameraResult.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\Dtos\\AddCameraResult.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\AddCameraResult.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\Dtos\\AddCameraResult.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwQAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:29:48.383Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "CameraDebugConfigResult.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\CameraDebugConfigResult.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\Dtos\\CameraDebugConfigResult.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\CameraDebugConfigResult.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\Dtos\\CameraDebugConfigResult.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAgwBQAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:29:53.088Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "CameraRoiResult.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\CameraRoiResult.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\Dtos\\CameraRoiResult.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\CameraRoiResult.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\Dtos\\CameraRoiResult.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwUAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:30:00.789Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "CameraImageResult.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\CameraImageResult.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\Dtos\\CameraImageResult.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\Dtos\\CameraImageResult.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\Dtos\\CameraImageResult.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwUAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:29:51.414Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "CameraImageService.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\CameraImageService.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Camera\\CameraImageService.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Camera\\CameraImageService.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Camera\\CameraImageService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:29:59.027Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "MonitorQueryService.cs",
+              "DocumentMoniker": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Monitor\\MonitorQueryService.cs",
+              "RelativeDocumentMoniker": "RealtimeEventApi\\Application\\Monitor\\MonitorQueryService.cs",
+              "ToolTip": "D:\\Dev\\realtime-event-api\\RealtimeEventApi\\Application\\Monitor\\MonitorQueryService.cs",
+              "RelativeToolTip": "RealtimeEventApi\\Application\\Monitor\\MonitorQueryService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-14T05:28:37.681Z"
             }
           ]
         }

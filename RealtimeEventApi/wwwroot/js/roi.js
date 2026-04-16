@@ -1,4 +1,7 @@
-﻿  const cameraIdEl = document.getElementById("cameraId");
+﻿const btnValidateAi = document.getElementById("btnValidateAi");
+const aiValidationText = document.getElementById("aiValidationText");
+
+const cameraIdEl = document.getElementById("cameraId");
 const btnLoad = document.getElementById("btnLoad");
 const btnSave = document.getElementById("btnSave");
 const btnModeObject = document.getElementById("btnModeObject");
@@ -11,12 +14,12 @@ const pageTitleEl = document.getElementById("pageTitle");
 const bgImage = document.getElementById("bgImage");
 const canvas = document.getElementById("roiCanvas");
 const canvasWrap = document.getElementById("canvasWrap");
-const roiText = document.getElementById("roiText");
 const stateText = document.getElementById("stateText");
 
 if (!(cameraIdEl instanceof HTMLInputElement) ||
     !(btnLoad instanceof HTMLButtonElement) ||
     !(btnSave instanceof HTMLButtonElement) ||
+    !(btnValidateAi instanceof HTMLButtonElement) ||
     !(btnModeObject instanceof HTMLButtonElement) ||
     !(btnModeLabel instanceof HTMLButtonElement) ||
     !(checkRotationEl instanceof HTMLInputElement) ||
@@ -26,8 +29,8 @@ if (!(cameraIdEl instanceof HTMLInputElement) ||
     !(bgImage instanceof HTMLImageElement) ||
     !(canvas instanceof HTMLCanvasElement) ||
     !(canvasWrap instanceof HTMLElement) ||
-    !(roiText instanceof HTMLElement) ||
-    !(stateText instanceof HTMLElement)) {
+    !(stateText instanceof HTMLElement) ||
+    !(aiValidationText instanceof HTMLElement)) {
     throw new Error("ROI 페이지 필수 요소를 찾을 수 없습니다.");
 }
 
@@ -242,36 +245,7 @@ function drawCanvas() {
         mode === "label"
     );
 
-    const objectOriginalNow = toOriginalRect(objectRoi);
-    const labelOriginalNow = toOriginalRect(labelRoi);
-
-    roiText.textContent =
-        `[회전 ROI - 화면 좌표]
-X = ${objectRoi.x}
-Y = ${objectRoi.y}
-W = ${objectRoi.w}
-H = ${objectRoi.h}
-
-[라벨 ROI - 화면 좌표]
-X = ${labelRoi.x}
-Y = ${labelRoi.y}
-W = ${labelRoi.w}
-H = ${labelRoi.h}
-
-[회전 ROI - 원본 좌표]
-X = ${objectOriginalNow.x}
-Y = ${objectOriginalNow.y}
-W = ${objectOriginalNow.w}
-H = ${objectOriginalNow.h}
-
-[라벨 ROI - 원본 좌표]
-X = ${labelOriginalNow.x}
-Y = ${labelOriginalNow.y}
-W = ${labelOriginalNow.w}
-H = ${labelOriginalNow.h}
-
-[편집 상태]
-roiDirty = ${roiDirty}`;
+    
 }
 
 function fitCanvasToImage(keepCurrentRect = true) {
@@ -502,35 +476,10 @@ async function loadState() {
         const s = await res.json();
 
         stateText.textContent =
-            `RotationActive           : ${boolText(s.rotationActive)}
-LabelInZone              : ${boolText(s.labelInZone)}
-CountedInCurrentRotation : ${boolText(s.countedInCurrentRotation)}
-
-LastStarted              : ${boolText(s.lastStarted)}
-LastEnded                : ${boolText(s.lastEnded)}
-LastLabelEnter           : ${boolText(s.lastLabelEnter)}
-
-LastDetectorFound        : ${boolText(s.lastDetectorFound)}
-LastDetectorConfidence   : ${s.lastDetectorConfidence}
-
-LabelDetectedStreak      : ${s.labelDetectedStreak}
-LabelOffStreak           : ${s.labelOffStreak}
-
-LastRotationChangeValue  : ${s.lastRotationChangeValue}
-LastMotionRatio          : ${s.lastMotionRatio}
-LastLabelChangeValue     : ${s.lastLabelChangeValue}
-
-ProductionCount          : ${s.productionCount}
-
-LastFrameAt              : ${s.lastFrameAt}
-LastSuccessfulReadAt     : ${s.lastSuccessfulReadAt}
-LastReconnectAt          : ${s.lastReconnectAt}
-SessionStartedAt         : ${s.sessionStartedAt}
-LastUpdatedAt            : ${s.lastUpdatedAt}
-StreamJustReconnected    : ${boolText(s.streamJustReconnected)}
-
-roiDirty                 : ${boolText(roiDirty)}
-activeAction             : ${activeAction ?? "-"}`;
+            `회전 감지 : ${boolText(checkRotationEl.checked)}
+라벨 감지 : ${boolText(checkLabelEl.checked)}
+생산 수량 : ${s.productionCount}
+마지막 프레임 : ${s.lastFrameAt ?? "-"}`;
     } catch (error) {
         console.error(error);
         stateText.textContent = "상태 조회 중 오류가 발생했습니다.";
@@ -609,6 +558,98 @@ async function saveRoi() {
         drawCanvas();
     }
 }
+
+async function validateAiRoi() {
+    const cameraId = Number(cameraIdEl.value);
+
+    console.log("[AI검증] 버튼 클릭");
+    console.log("[AI검증] cameraId =", cameraId);
+
+    if (!cameraId || cameraId <= 0) {
+        aiValidationText.textContent = "올바른 Camera ID를 입력하세요.";
+        return;
+    }
+
+    if (roiDirty) {
+        aiValidationText.textContent = "현재 ROI가 수정되었습니다. 먼저 ROI 저장 후 검증하세요.";
+        setSaveStatus("저장 후 AI 검증 가능", "err");
+        return;
+    }
+
+    btnValidateAi.disabled = true;
+    aiValidationText.textContent = "AI 검증 요청 중...";
+    setSaveStatus("AI 검증 중...", "saving");
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 timeout
+
+    try {
+        console.log("[AI검증] fetch 시작");
+
+        const res = await fetch(`/api/Camera/${cameraId}/validate-roi`, {
+            method: "POST",
+            headers: roiAuthHeaders(),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        console.log("[AI검증] 응답 도착 status =", res.status);
+
+        if (await handleUnauthorized(res)) return;
+
+        const rawText = await res.clone().text();
+        console.log("[AI검증] rawText =", rawText);
+
+        if (!res.ok) {
+            aiValidationText.textContent = `AI 검증 실패\n\n${rawText || "검증 요청 실패"}`;
+            setSaveStatus("AI 검증 실패", "err");
+            return;
+        }
+
+        const data = await res.json();
+
+        const ocrTexts = (data.labelTexts ?? []).join(", ") || "-";
+        const labelDetected = data.labelDetected === true;
+        const labelConfidence = Number(data.labelConfidence ?? 0);
+
+        let resultText = "실패";
+        if (labelDetected && labelConfidence >= 0.7) {
+            resultText = "정상";
+        } else if (labelDetected) {
+            resultText = "경고";
+        }
+
+        let statusClass = "ai-fail";
+        if (labelDetected && labelConfidence >= 0.7) statusClass = "ai-ok";
+        else if (labelDetected) statusClass = "ai-warn";
+
+        aiValidationText.innerHTML =
+            `판정 : <span class="${statusClass}">${resultText}</span>
+메시지 : ${data.message ?? "-"}
+텍스트 감지 : ${labelDetected ? "TRUE" : "FALSE"}
+OCR 신뢰도 : ${labelConfidence}
+읽힌 텍스트 : ${ocrTexts}`;
+
+        setSaveStatus(data.ok ? "AI 검증 완료" : "AI 검증 결과 확인", data.ok ? "ok" : "saving");
+    } catch (error) {
+        clearTimeout(timeoutId);
+        console.error("[AI검증] 오류 =", error);
+
+        if (error.name === "AbortError") {
+            aiValidationText.textContent = "AI 검증 요청이 10초 동안 응답이 없어 중단되었습니다.";
+            setSaveStatus("AI 검증 타임아웃", "err");
+        } else {
+            aiValidationText.textContent = "AI 검증 중 오류가 발생했습니다.";
+            setSaveStatus("AI 검증 오류", "err");
+        }
+    } finally {
+        btnValidateAi.disabled = false;
+    }
+}
+
+btnSave.addEventListener("click", saveRoi);
+btnValidateAi.addEventListener("click", validateAiRoi);
 
 btnLoad.addEventListener("click", async () => {
     updatePageTitle();

@@ -1,0 +1,36 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+
+# IDE
+.idea/
+.vscode/
+
+# Python debug images
+object_roi.jpg
+label_roi.jpg
+label_roi_ocr.jpg
+
+# logs / temp
+*.log
+*.tmp
+
+# Local config / secrets
+appsettings.Development.json
+appsettings.Local.json
+.env
+
+# MediaMTX runtime files
+RealtimeEventApi/tools/mediamtx/mediamtx.exe
+RealtimeEventApi/tools/mediamtx/*.log
+RealtimeEventApi/tools/mediamtx/*.yml
+RealtimeEventApi/tools/mediamtx/*.yaml
+
+# OS files
+Thumbs.db
+.DS_Store

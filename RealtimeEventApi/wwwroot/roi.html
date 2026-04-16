@@ -36,6 +36,7 @@
                                 <button id="btnModeObject" class="tool-btn btn-toggle active-mode" type="button">회전 ROI</button>
                                 <button id="btnModeLabel" class="tool-btn btn-toggle" type="button">라벨 ROI</button>
                                 <button id="btnSave" class="tool-btn btn-primary btn-emphasize" type="button">ROI 저장</button>
+                                <button id="btnValidateAi" class="tool-btn btn-secondary" type="button">AI 검증</button>
                             </div>
 
                             <div class="checks">
@@ -66,19 +67,19 @@
                         </div>
                     </section>
 
-                    <aside class="roi-side-stack">
+                    <aside class="roi-side-stack roi-side-stack--simple">
                         <section class="card roi-state-card">
                             <div class="card-head">
-                                <h3 class="section-title">상태</h3>
+                                <h3 class="section-title">간단 상태</h3>
                             </div>
-                            <pre id="stateText" class="roi-pre"></pre>
+                            <pre id="stateText" class="roi-pre roi-pre--compact"></pre>
                         </section>
 
-                        <section class="card roi-values-card">
+                        <section class="card roi-ai-card">
                             <div class="card-head">
-                                <h3 class="section-title">ROI 값</h3>
+                                <h3 class="section-title">AI 라벨 검증 요약</h3>
                             </div>
-                            <pre id="roiText" class="roi-pre roi-pre--values"></pre>
+                            <pre id="aiValidationText" class="roi-pre roi-pre--compact">아직 검증하지 않았습니다.</pre>
                         </section>
                     </aside>
                 </section>

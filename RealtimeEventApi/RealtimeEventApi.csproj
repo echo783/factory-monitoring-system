@@ -30,8 +30,6 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <Folder Include="Application\Delivery\" />
-	  <Folder Include="Application\Inventory\" />
 	  <Folder Include="Application\Auth\" />
 	</ItemGroup>
 </Project>

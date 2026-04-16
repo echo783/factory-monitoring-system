@@ -177,7 +177,6 @@ D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\tkka8mtg
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\n09n8s53q1-{0}-abx9byb5s2-abx9byb5s2.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\648f1levrn-{0}-d74me7a1af-d74me7a1af.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\tfpo5ors4j-{0}-9o7b90xadi-9o7b90xadi.gz
-D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\t9tjowhcke-{0}-0uo77s0an7-0uo77s0an7.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\s1z406q8u1-{0}-7emg96qiz9-7emg96qiz9.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\qwgarjdvel-{0}-jkhi0zqi5m-jkhi0zqi5m.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\wo8vhopjj7-{0}-5ipweew5fc-5ipweew5fc.gz
@@ -188,9 +187,7 @@ D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\jatzhrnh
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\86mxa82hse-{0}-7fq9dk5cus-7fq9dk5cus.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\2ze00334me-{0}-wwx728njl1-wwx728njl1.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\xr59xhssri-{0}-rryzdirwpk-rryzdirwpk.gz
-D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\571uwhgw36-{0}-3q54s9zgj6-3q54s9zgj6.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\1xc3r26l2j-{0}-f3zmpputtd-f3zmpputtd.gz
-D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\g0qa2thdyc-{0}-2z0f5oe5yt-2z0f5oe5yt.gz
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\staticwebassets.build.json
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\staticwebassets.build.json.cache
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\staticwebassets.development.json
@@ -204,3 +201,6 @@ D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\RealtimeEventApi.pd
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\RealtimeEventApi.genruntimeconfig.cache
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\ref\RealtimeEventApi.dll
 D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\RealtimeEventApi.sourcelink.json
+D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\t9tjowhcke-{0}-pk2acncmto-pk2acncmto.gz
+D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\571uwhgw36-{0}-tjvbxp531j-tjvbxp531j.gz
+D:\Dev\realtime-event-api\RealtimeEventApi\obj\Debug\net10.0\compressed\g0qa2thdyc-{0}-ndpbxmqel9-ndpbxmqel9.gz

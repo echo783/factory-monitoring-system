@@ -332,6 +332,29 @@
         }
       }
     },
+    "/api/Camera/{cameraId}/validate-roi": {
+      "post": {
+        "tags": [
+          "Camera"
+        ],
+        "parameters": [
+          {
+            "name": "cameraId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/delivery": {
       "post": {
         "tags": [

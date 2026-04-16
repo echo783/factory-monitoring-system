@@ -1,12 +1,15 @@
-﻿using FactoryApi.Application.Camera;
+﻿using FactoryApi.Application.Ai;
+using FactoryApi.Application.Camera;
 using FactoryApi.Application.Monitor;
+using FactoryApi.Infrastructure.Ai;
 using FactoryApi.Infrastructure.Auth;
 using FactoryApi.Infrastructure.CameraRuntime;
 using FactoryApi.Infrastructure.MediaMtx;
 using FactoryApi.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using RealtimeEventApi.Application.Camera;
 using System.Text;
 
 namespace FactoryApi.Infrastructure.DependencyInjection
@@ -88,6 +91,24 @@ namespace FactoryApi.Infrastructure.DependencyInjection
                 config.GetSection("MediaMtx"));
 
             services.AddSingleton<MediaMtxConfigWriter>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddAiServices(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var pythonBaseUrl = configuration["Ai:PythonBaseUrl"]
+                                ?? "http://127.0.0.1:8000";
+
+            services.AddHttpClient<PythonVisionClient>(client =>
+            {
+                client.BaseAddress = new Uri(pythonBaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(15);
+            });
+
+            services.AddScoped<CameraRoiValidationService>();
 
             return services;
         }

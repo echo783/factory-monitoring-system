@@ -144,6 +144,22 @@
   },
   {
     "ContainingType": "FactoryApi.Controllers.CameraController",
+    "Method": "ValidateRoi",
+    "RelativePath": "api/Camera/{cameraId}/validate-roi",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "cameraId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FactoryApi.Controllers.CameraController",
     "Method": "GetById",
     "RelativePath": "api/Camera/{id}",
     "HttpMethod": "GET",

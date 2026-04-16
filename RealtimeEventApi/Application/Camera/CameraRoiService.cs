@@ -2,8 +2,9 @@
 using FactoryApi.Infrastructure.CameraRuntime;
 using FactoryApi.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using RealtimeEventApi.Application.Camera.Dtos;
 
-namespace FactoryApi.Application.Camera
+namespace RealtimeEventApi.Application.Camera
 {
     public class CameraRoiService
     {
@@ -40,13 +41,6 @@ namespace FactoryApi.Application.Camera
 
             result.CameraExists = true;
 
-            //bool isValid = IsValidRoi(cameraId, request);
-            //if (!isValid)
-            //{
-            //    result.IsValidInput = false;
-            //    return result;
-            //}
-
             cam.ObjectRoiX = request.ObjectRoiX;
             cam.ObjectRoiY = request.ObjectRoiY;
             cam.ObjectRoiW = request.ObjectRoiW;
@@ -74,22 +68,6 @@ namespace FactoryApi.Application.Camera
             result.IsValidInput = true;
             return result;
         }
-
-        private bool IsValidRoi(int cameraId, SaveRoiRequest request)
-        {
-            if (request.ObjectRoiW <= 0 || request.ObjectRoiH <= 0 ||
-                request.LabelRoiW <= 0 || request.LabelRoiH <= 0)
-            {
-                _logger.LogWarning(
-                    "ROI INVALID INPUT | CameraId={CameraId} Obj=({OX},{OY},{OW},{OH}) Label=({LX},{LY},{LW},{LH})",
-                    cameraId,
-                    request.ObjectRoiX, request.ObjectRoiY, request.ObjectRoiW, request.ObjectRoiH,
-                    request.LabelRoiX, request.LabelRoiY, request.LabelRoiW, request.LabelRoiH);
-
-                return false;
-            }
-
-            return true;
-        }
+         
     }
 }

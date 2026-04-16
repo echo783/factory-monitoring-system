@@ -1,4 +1,4 @@
-﻿namespace FactoryApi.Application.Camera
+﻿namespace RealtimeEventApi.Application.Camera.Dtos
 {
     public class AddCameraResult
     {

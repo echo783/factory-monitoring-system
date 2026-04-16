@@ -2,6 +2,7 @@
 using FactoryApi.Infrastructure.CameraRuntime;
 using FactoryApi.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using RealtimeEventApi.Application.Camera.Dtos;
 
 namespace FactoryApi.Application.Camera
 {

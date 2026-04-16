@@ -1,9 +1,11 @@
-﻿using FactoryApi.Application.Camera;
+﻿using FactoryApi.Application.Ai;
+using FactoryApi.Application.Camera;
 using FactoryApi.Contracts.Requests.Camera;
 using FactoryApi.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using RealtimeEventApi.Application.Camera;
 
 namespace FactoryApi.Controllers
 {
@@ -19,6 +21,7 @@ namespace FactoryApi.Controllers
         private readonly CameraImageService _imageService;
         private readonly CameraRoiService _roiService;
         private readonly CameraCommandService _commandService;
+        private readonly CameraRoiValidationService _roiValidationService;
 
         public CameraController(
         CameraQueryService queryService,
@@ -27,7 +30,8 @@ namespace FactoryApi.Controllers
         CameraImageService imageService,
         CameraDebugService debugService,
         ILogger<CameraController> logger,
-        IHubContext<CameraHub> hubContext
+        IHubContext<CameraHub> hubContext,
+        CameraRoiValidationService roiValidationService
         )
         {
             _queryService = queryService;
@@ -37,6 +41,7 @@ namespace FactoryApi.Controllers
             _commandService = commandService;   
             _logger = logger;
             _hubContext = hubContext;
+             _roiValidationService = roiValidationService;
         }
 
         // 1. 전체 카메라 목록 조회
@@ -212,6 +217,38 @@ namespace FactoryApi.Controllers
             {
                 message = "카메라 삭제 완료",
                 cameraId = id
+            });
+        }
+
+        [HttpPost("{cameraId:int}/validate-roi")]
+        public async Task<IActionResult> ValidateRoi(
+     int cameraId,
+     CancellationToken token)
+        {
+            var result = await _roiValidationService.ValidateAsync(cameraId, token);
+
+            if (!result.CameraExists)
+                return NotFound(result.Message);
+
+            if (!result.ImageExists)
+                return NotFound(result.Message);
+
+            return Ok(new
+            {
+                ok = result.Success,
+                message = result.Message,
+                imagePath = result.ImagePath,
+
+                objectDetected = result.ObjectDetected,
+                objectConfidence = result.ObjectConfidence,
+                objectCount = result.ObjectCount,
+                objectClasses = result.ObjectClasses,
+
+                labelDetected = result.LabelDetected,
+                labelConfidence = result.LabelConfidence,
+                labelCount = result.LabelCount,
+                labelTexts = result.LabelTexts,
+                labelKeywordFound = result.LabelKeywordFound
             });
         }
 
