@@ -53,7 +53,7 @@ API (ASP.NET Core)
 Web UI (Realtime Dashboard)
 ```
 
-Architecture
+## Architecture
 ```text
 Controller → Application → Infrastructure
                       ↓
