@@ -139,14 +139,14 @@ AI 분석 기능 확장 (LLM 기반 운영 분석)
 
 ## Quick Start (Database)
 
-```MSSQL
-
+```
+MSSQL
 ProductVersion : 17.0.1000.7
 ProductLevel : RTM
 Edition : Express Edition (64-bit)
 create DB : FactoryDB
 docs/sql/schema-and-seed.sql 실행
- 
+```
 
 
 
