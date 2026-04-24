@@ -88,10 +88,9 @@ AI는 코드 생성 도구가 아니라
 
 Human Role – CHANWOOK JEONG
 
-- 시스템 전체 구조 설계
-- AI 결과 검증 및 통합
-- Runtime / Application 분리 구조 설계
-- 실제 운영 가능한 형태로 시스템 완성
+- 시스템 구조 설계
+- AI 결과 검증 통합
+- 시스템 완성
   
 **AI tools were used as engineering partners, not as shortcuts.
 Human judgment connected the AI-assisted outputs into one working system.**
