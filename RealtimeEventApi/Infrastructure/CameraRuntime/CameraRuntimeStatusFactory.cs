@@ -23,7 +23,8 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                 ChangedAt = DateTime.Now,
                 LastSuccessfulReadAt = ToNullableTime(state?.LastSuccessfulReadAt),
                 LastErrorAt = ToNullableTime(state?.LastErrorAt),
-                LastErrorMessage = state?.LastErrorMessage ?? string.Empty
+                LastErrorMessage = state?.LastErrorMessage ?? string.Empty,
+                ProductionCount = state?.ProductionCount ?? 0
             };
         }
 
@@ -35,7 +36,8 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                 status.Message,
                 status.LastSuccessfulReadAt?.Ticks.ToString() ?? "",
                 status.LastErrorAt?.Ticks.ToString() ?? "",
-                status.LastErrorMessage);
+                status.LastErrorMessage,
+                status.ProductionCount.ToString());
         }
 
         private static (string Status, string Message) GetRuntimeStatus(

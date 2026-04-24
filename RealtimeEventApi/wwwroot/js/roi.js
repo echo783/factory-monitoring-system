@@ -1,16 +1,11 @@
-﻿let aiAnalysisBusy = false;
+let aiAnalysisBusy = false;
 let latestValidationResult = null;
 let latestDebugState = null;
 
-const aiAnalysisText = document.getElementById("aiAnalysisText");
-const btnAiAnalysis = document.getElementById("btn-ai-analysis");
-
-const btnValidateAi = document.getElementById("btnValidateAi");
-const aiValidationText = document.getElementById("aiValidationText");
-
-const cameraIdEl = document.getElementById("cameraId");
+const cameraSelectEl = document.getElementById("cameraSelect");
 const btnLoad = document.getElementById("btnLoad");
 const btnSave = document.getElementById("btnSave");
+const btnLiveRefresh = document.getElementById("btnLiveRefresh");
 const btnModeObject = document.getElementById("btnModeObject");
 const btnModeLabel = document.getElementById("btnModeLabel");
 const checkRotationEl = document.getElementById("checkRotation");
@@ -18,66 +13,26 @@ const checkLabelEl = document.getElementById("checkLabel");
 const saveStatusEl = document.getElementById("saveStatus");
 const pageTitleEl = document.getElementById("pageTitle");
 
+const btnValidateAi = document.getElementById("btnValidateAi");
+const aiValidationText = document.getElementById("aiValidationText");
+const btnAiAnalysis = document.getElementById("btn-ai-analysis");
+const aiAnalysisText = document.getElementById("aiAnalysisText");
+
 const bgImage = document.getElementById("bgImage");
 const canvas = document.getElementById("roiCanvas");
 const canvasWrap = document.getElementById("canvasWrap");
+const statusOverlay = document.getElementById("statusOverlay");
 const stateText = document.getElementById("stateText");
 
-if (!(cameraIdEl instanceof HTMLInputElement) ||
-    !(btnLoad instanceof HTMLButtonElement) ||
-    !(btnSave instanceof HTMLButtonElement) ||
-    !(btnValidateAi instanceof HTMLButtonElement) ||
-    !(btnModeObject instanceof HTMLButtonElement) ||
-    !(btnModeLabel instanceof HTMLButtonElement) ||
-    !(checkRotationEl instanceof HTMLInputElement) ||
-    !(checkLabelEl instanceof HTMLInputElement) ||
-    !(saveStatusEl instanceof HTMLElement) ||
-    !(pageTitleEl instanceof HTMLElement) ||
-    !(bgImage instanceof HTMLImageElement) ||
-    !(canvas instanceof HTMLCanvasElement) ||
-    !(canvasWrap instanceof HTMLElement) ||
-    !(stateText instanceof HTMLElement) ||
-    !(aiValidationText instanceof HTMLElement) ||
-    !(btnAiAnalysis instanceof HTMLButtonElement) ||
-    !(aiAnalysisText instanceof HTMLElement)) {
-    throw new Error("ROI 페이지 필수 요소를 찾을 수 없습니다.");
-}
-
 const ctx = canvas.getContext("2d");
-if (!ctx) {
-    throw new Error("Canvas 2D context를 생성할 수 없습니다.");
-}
 
-function redirectToLogin() {
-    location.href = "/login.html";
-}
-
-function ensureLoggedIn() {
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) {
-        alert("로그인이 필요합니다.");
-        redirectToLogin();
-        return false;
-    }
-    return true;
-}
-
-function roiAuthHeaders(extra = {}) {
-    const accessToken = localStorage.getItem("accessToken");
-    return {
-        "Authorization": "Bearer " + accessToken,
-        ...extra
-    };
-}
-
-async function handleUnauthorized(res) {
-    if (res.status === 401) {
-        alert("세션 만료. 다시 로그인하세요.");
-        redirectToLogin();
-        return true;
-    }
-    return false;
-}
+// --- State Variables ---
+let cameraId = 1;
+let currentStatus = "Unknown";
+let isLiveRefresh = false;
+let pollingTimer = null;
+let signalRConnection = null;
+let joinedCameraGroupId = null;
 
 let mode = "object";
 let refreshBusy = false;
@@ -96,42 +51,48 @@ let labelRoiOriginal = { x: 120, y: 100, w: 90, h: 90 };
 let objectRoi = { x: 50, y: 50, w: 200, h: 240 };
 let labelRoi = { x: 120, y: 100, w: 90, h: 90 };
 
-if (!ensureLoggedIn()) {
-    throw new Error("로그인되지 않은 상태입니다.");
+// --- Helpers ---
+function showOverlay(message) {
+    if (!statusOverlay) return;
+    statusOverlay.textContent = message;
+    statusOverlay.hidden = false;
+    statusOverlay.style.display = "flex";
 }
 
-const queryCameraId = Number(new URLSearchParams(window.location.search).get("cameraId"));
-if (Number.isInteger(queryCameraId) && queryCameraId > 0) {
-    cameraIdEl.value = String(queryCameraId);
+function hideOverlay() {
+    if (!statusOverlay) return;
+    statusOverlay.hidden = true;
+    statusOverlay.style.display = "none";
 }
 
-function updatePageTitle(cameraName) {
-    const currentCameraId = Number(cameraIdEl.value) || 1;
-    const title = cameraName
-        ? `${cameraName} ROI 디버그`
-        : `Camera ${currentCameraId} ROI 디버그`;
-    pageTitleEl.textContent = title;
-    document.title = title;
+function authHeaders(extra = {}) {
+    const token = localStorage.getItem("accessToken");
+    return { "Authorization": `Bearer ${token}`, ...extra };
 }
 
-updatePageTitle();
+async function handleUnauthorized(res) {
+    if (res.status === 401) {
+        alert("세션 만료. 다시 로그인하세요.");
+        location.href = "/login.html";
+        return true;
+    }
+    return false;
+}
 
 function setSaveStatus(text, css) {
     saveStatusEl.textContent = text;
     saveStatusEl.className = `save-status ${css}`;
 }
 
-function getSelectedRect() {
-    return mode === "object" ? objectRoi : labelRoi;
+function updatePageTitle(cameraName) {
+    const title = cameraName ? `${cameraName} ROI 디버그` : `Camera ${cameraId} ROI 디버그`;
+    pageTitleEl.textContent = title;
+    document.title = title;
 }
 
-function setSelectedRect(rect) {
-    if (mode === "object") {
-        objectRoi = rect;
-    } else {
-        labelRoi = rect;
-    }
-}
+// --- ROI Logic ---
+function getSelectedRect() { return mode === "object" ? objectRoi : labelRoi; }
+function setSelectedRect(rect) { if (mode === "object") objectRoi = rect; else labelRoi = rect; }
 
 function setMode(nextMode) {
     mode = nextMode;
@@ -140,608 +101,394 @@ function setMode(nextMode) {
     drawCanvas();
 }
 
-btnModeObject.addEventListener("click", () => setMode("object"));
-btnModeLabel.addEventListener("click", () => setMode("label"));
-
-function clamp(v, min, max) {
-    return Math.max(min, Math.min(max, v));
-}
-
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 function clampRectToCanvas(rect) {
-    const maxW = canvas.width;
-    const maxH = canvas.height;
-
-    rect.w = clamp(rect.w, MIN_SIZE, Math.max(MIN_SIZE, maxW));
-    rect.h = clamp(rect.h, MIN_SIZE, Math.max(MIN_SIZE, maxH));
-
-    rect.x = clamp(rect.x, 0, Math.max(0, maxW - rect.w));
-    rect.y = clamp(rect.y, 0, Math.max(0, maxH - rect.h));
-
+    rect.w = clamp(rect.w, MIN_SIZE, canvas.width);
+    rect.h = clamp(rect.h, MIN_SIZE, canvas.height);
+    rect.x = clamp(rect.x, 0, canvas.width - rect.w);
+    rect.y = clamp(rect.y, 0, canvas.height - rect.h);
     return rect;
 }
 
 function getHandleRect(rect) {
-    return {
-        x: rect.x + rect.w - HANDLE_SIZE,
-        y: rect.y + rect.h - HANDLE_SIZE,
-        w: HANDLE_SIZE,
-        h: HANDLE_SIZE
-    };
+    return { x: rect.x + rect.w - HANDLE_SIZE, y: rect.y + rect.h - HANDLE_SIZE, w: HANDLE_SIZE, h: HANDLE_SIZE };
 }
 
 function pointInRect(x, y, rect) {
-    return x >= rect.x && x <= rect.x + rect.w &&
-        y >= rect.y && y <= rect.y + rect.h;
+    return x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 }
 
 function drawSingleRect(rect, strokeColor, fillColor, title, selected) {
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = selected ? 3 : 2;
     ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
-
     ctx.fillStyle = fillColor;
     ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-
     ctx.fillStyle = strokeColor;
     ctx.font = "bold 14px Arial";
     ctx.fillText(title, rect.x + 6, Math.max(18, rect.y - 8));
-
     if (selected) {
         const h = getHandleRect(rect);
         ctx.fillStyle = strokeColor;
         ctx.fillRect(h.x, h.y, h.w, h.h);
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(h.x, h.y, h.w, h.h);
     }
 }
 
 function getDisplayScale() {
-    if (!bgImage.naturalWidth || !bgImage.naturalHeight || !canvas.width || !canvas.height) {
-        return { scaleX: 1, scaleY: 1 };
-    }
-
-    return {
-        scaleX: canvas.width / bgImage.naturalWidth,
-        scaleY: canvas.height / bgImage.naturalHeight
-    };
+    if (!bgImage.naturalWidth || !canvas.width) return { scaleX: 1, scaleY: 1 };
+    return { scaleX: canvas.width / bgImage.naturalWidth, scaleY: canvas.height / bgImage.naturalHeight };
 }
 
 function toDisplayRect(srcRect) {
     const { scaleX, scaleY } = getDisplayScale();
-
-    return {
-        x: Math.round(srcRect.x * scaleX),
-        y: Math.round(srcRect.y * scaleY),
-        w: Math.round(srcRect.w * scaleX),
-        h: Math.round(srcRect.h * scaleY)
-    };
+    return { x: Math.round(srcRect.x * scaleX), y: Math.round(srcRect.y * scaleY), w: Math.round(srcRect.w * scaleX), h: Math.round(srcRect.h * scaleY) };
 }
 
 function toOriginalRect(displayRect) {
     const { scaleX, scaleY } = getDisplayScale();
-
-    return {
-        x: Math.round(displayRect.x / scaleX),
-        y: Math.round(displayRect.y / scaleY),
-        w: Math.round(displayRect.w / scaleX),
-        h: Math.round(displayRect.h / scaleY)
-    };
+    return { x: Math.round(displayRect.x / scaleX), y: Math.round(displayRect.y / scaleY), w: Math.round(displayRect.w / scaleX), h: Math.round(displayRect.h / scaleY) };
 }
 
-function syncDisplayRectsFromOriginal() {
+function drawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawSingleRect(objectRoi, "#2563eb", "rgba(37,99,235,0.16)", "ROTATION", mode === "object");
+    drawSingleRect(labelRoi, "#ef4444", "rgba(239,68,68,0.16)", "LABEL", mode === "label");
+}
+
+function fitCanvasToImage() {
+    canvas.width = bgImage.clientWidth;
+    canvas.height = bgImage.clientHeight;
     objectRoi = clampRectToCanvas(toDisplayRect(objectRoiOriginal));
     labelRoi = clampRectToCanvas(toDisplayRect(labelRoiOriginal));
     drawCanvas();
 }
 
-function drawCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+// --- API Calls ---
+async function loadCameraOptions() {
+    try {
+        const res = await fetch("/api/Camera/list", { headers: authHeaders() });
+        if (await handleUnauthorized(res)) return;
+        const cameras = await res.json();
+        cameraSelectEl.innerHTML = "";
+        cameras.forEach(cam => {
+            const opt = document.createElement("option");
+            opt.value = cam.cameraId;
+            opt.textContent = `${cam.cameraName} (${cam.cameraId})`;
+            cameraSelectEl.appendChild(opt);
+        });
 
-    drawSingleRect(
-        objectRoi,
-        "#2563eb",
-        "rgba(37,99,235,0.16)",
-        "ROTATION",
-        mode === "object"
-    );
-
-    drawSingleRect(
-        labelRoi,
-        "#ef4444",
-        "rgba(239,68,68,0.16)",
-        "LABEL",
-        mode === "label"
-    );
-}
-
-function fitCanvasToImage(keepCurrentRect = true) {
-    const oldWidth = canvas.width || 1;
-    const oldHeight = canvas.height || 1;
-
-    const prevObject = { ...objectRoi };
-    const prevLabel = { ...labelRoi };
-
-    canvas.width = bgImage.clientWidth;
-    canvas.height = bgImage.clientHeight;
-
-    if (!keepCurrentRect || oldWidth <= 1 || oldHeight <= 1) {
-        syncDisplayRectsFromOriginal();
-        return;
-    }
-
-    const scaleX = canvas.width / oldWidth;
-    const scaleY = canvas.height / oldHeight;
-
-    objectRoi = clampRectToCanvas({
-        x: Math.round(prevObject.x * scaleX),
-        y: Math.round(prevObject.y * scaleY),
-        w: Math.round(prevObject.w * scaleX),
-        h: Math.round(prevObject.h * scaleY)
-    });
-
-    labelRoi = clampRectToCanvas({
-        x: Math.round(prevLabel.x * scaleX),
-        y: Math.round(prevLabel.y * scaleY),
-        w: Math.round(prevLabel.w * scaleX),
-        h: Math.round(prevLabel.h * scaleY)
-    });
-
-    drawCanvas();
-}
-
-function getMousePos(evt) {
-    const rect = canvas.getBoundingClientRect();
-    return {
-        x: Math.round(evt.clientX - rect.left),
-        y: Math.round(evt.clientY - rect.top)
-    };
-}
-
-function applyCursor(x, y) {
-    const rect = getSelectedRect();
-    const handle = getHandleRect(rect);
-
-    if (pointInRect(x, y, handle)) {
-        canvas.style.cursor = "nwse-resize";
-        return;
-    }
-
-    if (pointInRect(x, y, rect)) {
-        canvas.style.cursor = "move";
-        return;
-    }
-
-    canvas.style.cursor = "default";
-}
-
-canvas.addEventListener("mousedown", (e) => {
-    const p = getMousePos(e);
-    const rect = getSelectedRect();
-    const handle = getHandleRect(rect);
-
-    dragMouseStart = p;
-    dragRectStart = { ...rect };
-
-    if (pointInRect(p.x, p.y, handle)) {
-        activeAction = "resize";
-        return;
-    }
-
-    if (pointInRect(p.x, p.y, rect)) {
-        activeAction = "move";
-        return;
-    }
-
-    activeAction = null;
-});
-
-canvas.addEventListener("mousemove", (e) => {
-    const p = getMousePos(e);
-
-    if (!activeAction) {
-        applyCursor(p.x, p.y);
-        return;
-    }
-
-    let rect = { ...dragRectStart };
-
-    if (activeAction === "move") {
-        const dx = p.x - dragMouseStart.x;
-        const dy = p.y - dragMouseStart.y;
-
-        rect.x = dragRectStart.x + dx;
-        rect.y = dragRectStart.y + dy;
-
-        setSelectedRect(clampRectToCanvas(rect));
-        roiDirty = true;
-        setSaveStatus("ROI 수정됨 - 저장 필요", "saving");
-        drawCanvas();
-        return;
-    }
-
-    if (activeAction === "resize") {
-        rect.w = Math.max(MIN_SIZE, dragRectStart.w + (p.x - dragMouseStart.x));
-        rect.h = Math.max(MIN_SIZE, dragRectStart.h + (p.y - dragMouseStart.y));
-
-        if (rect.x + rect.w > canvas.width) {
-            rect.w = canvas.width - rect.x;
-        }
-        if (rect.y + rect.h > canvas.height) {
-            rect.h = canvas.height - rect.y;
-        }
-
-        setSelectedRect(clampRectToCanvas(rect));
-        roiDirty = true;
-        setSaveStatus("ROI 수정됨 - 저장 필요", "saving");
-        drawCanvas();
-        return;
-    }
-});
-
-window.addEventListener("mouseup", () => {
-    activeAction = null;
-    dragRectStart = null;
-    dragMouseStart = null;
-});
-
-window.addEventListener("resize", () => {
-    if (!bgImage.naturalWidth || !bgImage.naturalHeight) return;
-    fitCanvasToImage(true);
-});
-
-async function refreshImageOnly() {
-    const cameraId = Number(cameraIdEl.value);
-
-    await new Promise((resolve) => {
-        let done = false;
-
-        const finish = () => {
-            if (done) return;
-            done = true;
-            resolve();
-        };
-
-        bgImage.onload = () => {
-            fitCanvasToImage(true);
-            canvasWrap.classList.add("ready");
-            finish();
-        };
-
-        bgImage.onerror = () => finish();
-
-        bgImage.src = `/api/Camera/${cameraId}/image?t=${Date.now()}`;
-
-        setTimeout(finish, 1500);
-    });
+        const qId = new URLSearchParams(window.location.search).get("cameraId");
+        if (qId) cameraSelectEl.value = qId;
+        cameraId = Number(cameraSelectEl.value);
+    } catch (e) { console.error(e); }
 }
 
 async function loadConfig() {
-    const cameraId = Number(cameraIdEl.value);
-
     try {
-        const res = await fetch(`/api/Camera/${cameraId}/debug-config`, {
-            headers: roiAuthHeaders()
-        });
-
+        const res = await fetch(`/api/Camera/${cameraId}/debug-config`, { headers: authHeaders() });
         if (await handleUnauthorized(res)) return;
-
-        if (!res.ok) {
-            setSaveStatus("설정 정보를 불러오지 못했습니다.", "err");
-            return;
-        }
-
+        if (!res.ok) return;
         const data = await res.json();
         updatePageTitle(data.cameraName);
-
         checkRotationEl.checked = data.checkRotation;
         checkLabelEl.checked = data.checkLabel;
-
-        objectRoiOriginal = {
-            x: data.objectRoiX,
-            y: data.objectRoiY,
-            w: data.objectRoiW,
-            h: data.objectRoiH
-        };
-
-        labelRoiOriginal = {
-            x: data.labelRoiX,
-            y: data.labelRoiY,
-            w: data.labelRoiW,
-            h: data.labelRoiH
-        };
-
-        await refreshImageOnly();
-        syncDisplayRectsFromOriginal();
-        roiDirty = false;
-        drawCanvas();
-    } catch (error) {
-        console.error(error);
-        setSaveStatus("설정 조회 중 오류가 발생했습니다.", "err");
-    }
-}
-
-function boolText(v) {
-    return v ? "TRUE" : "FALSE";
+        objectRoiOriginal = { x: data.objectRoiX, y: data.objectRoiY, w: data.objectRoiW, h: data.objectRoiH };
+        labelRoiOriginal = { x: data.labelRoiX, y: data.labelRoiY, w: data.labelRoiW, h: data.labelRoiH };
+        fitCanvasToImage();
+    } catch (e) { console.error(e); }
 }
 
 async function loadState() {
-    const cameraId = Number(cameraIdEl.value);
-
     try {
-        const res = await fetch(`/api/Camera/${cameraId}/debug-state`, {
-            headers: roiAuthHeaders()
-        });
-
+        const res = await fetch(`/api/Camera/${cameraId}/status`, { headers: authHeaders() });
         if (await handleUnauthorized(res)) return;
+        if (!res.ok) return;
+        const data = await res.json();
+        currentStatus = data.status;
+        updateStatusUI(data);
+    } catch (e) { console.error(e); }
+}
 
-        if (!res.ok) {
-            stateText.textContent = "상태 정보를 불러오지 못했습니다.";
-            return;
+async function updateImage() {
+    if (refreshBusy) return;
+    if (currentStatus !== "Running") return;
+
+    // 이미 이미지가 로드되어 보이고 있다면 로딩 중 안내를 표시하지 않음
+    const isImageVisible = bgImage.complete && bgImage.naturalWidth > 0;
+    
+    if (!isImageVisible && !canvasWrap.classList.contains("ready")) {
+        showOverlay("이미지를 로딩 중입니다...");
+    }
+
+    refreshBusy = true;
+    return new Promise(resolve => {
+        bgImage.onload = () => {
+            fitCanvasToImage();
+            canvasWrap.classList.add("ready");
+            // 로드 성공 시 Running 상태라면 무조건 오버레이 숨김
+            if (currentStatus === "Running") {
+                hideOverlay();
+            }
+            refreshBusy = false;
+            resolve();
+        };
+        bgImage.onerror = () => { 
+            showOverlay("이미지 로드 실패");
+            refreshBusy = false; 
+            resolve(); 
+        };
+        bgImage.src = `/api/Camera/${cameraId}/image?t=${Date.now()}`;
+    });
+}
+
+function updateStatusUI(data) {
+    if (Number(data.cameraId) !== cameraId) return;
+
+    const prevStatus = currentStatus;
+    currentStatus = data.status;
+
+    // 1. 배지 및 상태 텍스트 업데이트
+    let badgeClass = "idle";
+    let statusText = data.status;
+
+    switch (data.status) {
+        case "Running": badgeClass = "ok"; break;
+        case "Starting":
+        case "Connecting":
+        case "Stopping":
+            badgeClass = "saving"; break;
+        case "Error":
+        case "Stale":
+            badgeClass = "err"; break;
+        case "Stopped": badgeClass = "idle"; break;
+    }
+
+    setSaveStatus(statusText, badgeClass);
+
+    stateText.textContent = `Camera: ${data.cameraName} (${data.cameraId})
+Status: ${data.status}
+Enabled: ${data.enabled}
+Production: ${data.productionCount ?? 0}
+Last Update: ${new Date(data.changedAt).toLocaleTimeString()}
+Message: ${data.message}`;
+
+    // 2. 버튼 활성화 제어
+    const isCameraReady = data.status === "Running";
+    if (btnValidateAi) btnValidateAi.disabled = !isCameraReady;
+    if (btnAiAnalysis) btnAiAnalysis.disabled = !isCameraReady;
+    if (btnLiveRefresh) btnLiveRefresh.disabled = !isCameraReady;
+
+    // 3. 오버레이 및 폴링 제어
+    if (isCameraReady) {
+        // 이미지가 로드된 상태거나 그릴 준비가 되었다면 오버레이 즉시 숨김
+        const isImageVisible = bgImage.complete && bgImage.naturalWidth > 0;
+        if (isImageVisible || canvasWrap.classList.contains("ready")) {
+            hideOverlay();
+        } else {
+            showOverlay("이미지를 로딩 중입니다...");
         }
 
-        const s = await res.json();
-        latestDebugState = s;
-
-        stateText.textContent =
-            `회전 감지 : ${boolText(checkRotationEl.checked)}
-라벨 감지 : ${boolText(checkLabelEl.checked)}
-생산 수량 : ${s.productionCount}
-마지막 프레임 : ${s.lastFrameAt ?? "-"}`;
-    } catch (error) {
-        console.error(error);
-        stateText.textContent = "상태 조회 중 오류가 발생했습니다.";
+        // 처음 Running이 되었거나 이미지가 아예 없는 경우 강제 로드
+        if (prevStatus !== "Running" || !canvasWrap.classList.contains("ready")) {
+            updateImage();
+        }
+        
+        if (isLiveRefresh) startPolling();
+    } else {
+        let msg = "카메라가 실행 중이 아닙니다.";
+        if (data.status === "Starting" || data.status === "Connecting") msg = "카메라 연결 중...";
+        if (data.status === "Error") msg = `카메라 오류: ${data.message || "연결 실패"}`;
+        
+        showOverlay(msg);
+        stopPolling();
+        canvasWrap.classList.remove("ready");
     }
 }
 
-function validateRoi(rect, name) {
-    if (rect.w <= 0 || rect.h <= 0) {
-        setSaveStatus(`${name} ROI의 폭/높이가 0입니다.`, "err");
-        return false;
-    }
-    if (rect.w < MIN_SIZE || rect.h < MIN_SIZE) {
-        setSaveStatus(`${name} ROI가 너무 작습니다.`, "err");
-        return false;
-    }
-    return true;
+// --- Polling & SignalR ---
+function startPolling() {
+    if (pollingTimer) return;
+    const loop = async () => {
+        if (!isLiveRefresh || currentStatus !== "Running") {
+            stopPolling();
+            return;
+        }
+        await updateImage();
+        pollingTimer = setTimeout(loop, 1000);
+    };
+    loop();
 }
 
-async function saveRoi() {
+function stopPolling() {
+    if (pollingTimer) {
+        clearTimeout(pollingTimer);
+        pollingTimer = null;
+    }
+}
+
+async function switchCameraGroup(nextId) {
+    if (!signalRConnection || signalRConnection.state !== "Connected") return;
+    if (joinedCameraGroupId === nextId) return;
+    if (joinedCameraGroupId !== null) await signalRConnection.invoke("LeaveCameraGroup", joinedCameraGroupId);
+    await signalRConnection.invoke("JoinCameraGroup", nextId);
+    joinedCameraGroupId = nextId;
+}
+
+function setHubState(state) {
+    if (typeof window.updateGlobalHubState === "function") {
+        if (state === "connected") {
+            window.updateGlobalHubState("connected", "Connected");
+        } else if (state === "reconnecting") {
+            window.updateGlobalHubState("reconnecting", "Reconnecting");
+        } else {
+            window.updateGlobalHubState("disconnected", "Disconnected");
+        }
+    }
+}
+
+async function connectHub() {
+    signalRConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/hubs/camera", { accessTokenFactory: () => localStorage.getItem("accessToken") })
+        .withAutomaticReconnect()
+        .build();
+
+    signalRConnection.on("CameraStatusChanged", data => {
+        if (Number(data.cameraId) === cameraId) {
+            currentStatus = data.status;
+            updateStatusUI(data);
+        }
+    });
+
+    signalRConnection.onreconnecting(() => {
+        setHubState("reconnecting");
+    });
+
+    signalRConnection.onreconnected(async () => {
+        setHubState("connected");
+        await switchCameraGroup(cameraId);
+        await loadState();
+    });
+
+    signalRConnection.onclose(() => {
+        setHubState("disconnected");
+    });
+
+    try {
+        await signalRConnection.start();
+        setHubState("connected");
+        await switchCameraGroup(cameraId);
+    } catch (e) {
+        console.error(e);
+        setHubState("disconnected");
+    }
+}
+
+// --- Event Listeners ---
+cameraSelectEl.addEventListener("change", async () => {
+    cameraId = Number(cameraSelectEl.value);
+    roiDirty = false;
+    canvasWrap.classList.remove("ready");
+    setSaveStatus("카메라 동기화 중...", "saving");
+    await switchCameraGroup(cameraId);
+    await loadConfig();
+    await loadState();
+    await updateImage();
+});
+
+btnLiveRefresh.addEventListener("click", () => {
+    isLiveRefresh = !isLiveRefresh;
+    btnLiveRefresh.classList.toggle("active-mode", isLiveRefresh);
+    if (isLiveRefresh) startPolling();
+    else stopPolling();
+});
+
+btnSave.addEventListener("click", async () => {
     if (saveBusy) return;
-
-    if (!validateRoi(objectRoi, "회전")) return;
-    if (!validateRoi(labelRoi, "라벨")) return;
-
     saveBusy = true;
     btnSave.disabled = true;
     setSaveStatus("ROI 저장 중...", "saving");
 
     try {
-        const cameraId = Number(cameraIdEl.value);
-
-        objectRoiOriginal = toOriginalRect(objectRoi);
-        labelRoiOriginal = toOriginalRect(labelRoi);
-
         const payload = {
-            objectRoiX: objectRoiOriginal.x,
-            objectRoiY: objectRoiOriginal.y,
-            objectRoiW: objectRoiOriginal.w,
-            objectRoiH: objectRoiOriginal.h,
-
-            labelRoiX: labelRoiOriginal.x,
-            labelRoiY: labelRoiOriginal.y,
-            labelRoiW: labelRoiOriginal.w,
-            labelRoiH: labelRoiOriginal.h,
-
+            objectRoiX: toOriginalRect(objectRoi).x,
+            objectRoiY: toOriginalRect(objectRoi).y,
+            objectRoiW: toOriginalRect(objectRoi).w,
+            objectRoiH: toOriginalRect(objectRoi).h,
+            labelRoiX: toOriginalRect(labelRoi).x,
+            labelRoiY: toOriginalRect(labelRoi).y,
+            labelRoiW: toOriginalRect(labelRoi).w,
+            labelRoiH: toOriginalRect(labelRoi).h,
             checkRotation: checkRotationEl.checked,
             checkLabel: checkLabelEl.checked
         };
 
         const res = await fetch(`/api/Camera/${cameraId}/roi`, {
             method: "POST",
-            headers: roiAuthHeaders({
-                "Content-Type": "application/json"
-            }),
+            headers: authHeaders({ "Content-Type": "application/json" }),
             body: JSON.stringify(payload)
         });
 
         if (await handleUnauthorized(res)) return;
-
-        if (!res.ok) {
-            setSaveStatus("ROI 저장 실패", "err");
-            return;
+        if (res.ok) {
+            roiDirty = false;
+            setSaveStatus("저장 완료", "ok");
+            await loadConfig();
+        } else {
+            setSaveStatus("저장 실패", "err");
         }
-
-        roiDirty = false;
-        setSaveStatus("ROI 저장 완료", "ok");
-
-        await loadConfig();
-        await loadState();
     } catch (e) {
-        console.error(e);
-        setSaveStatus("ROI 저장 중 오류 발생", "err");
+        setSaveStatus("오류 발생", "err");
     } finally {
         saveBusy = false;
         btnSave.disabled = false;
-        drawCanvas();
     }
-}
-
-async function validateAiRoi() {
-    const cameraId = Number(cameraIdEl.value);
-
-    if (!cameraId || cameraId <= 0) {
-        aiValidationText.textContent = "올바른 Camera ID를 입력하세요.";
-        return;
-    }
-
-    if (roiDirty) {
-        aiValidationText.textContent = "현재 ROI가 수정되었습니다. 먼저 ROI 저장 후 검증하세요.";
-        setSaveStatus("저장 후 AI 검증 가능", "err");
-        return;
-    }
-
-    btnValidateAi.disabled = true;
-    aiValidationText.textContent = "AI 검증 요청 중...";
-    setSaveStatus("AI 검증 중...", "saving");
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    try {
-        const res = await fetch(`/api/Camera/${cameraId}/validate-roi`, {
-            method: "POST",
-            headers: roiAuthHeaders(),
-            signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        if (await handleUnauthorized(res)) return;
-
-        const rawText = await res.clone().text();
-
-        if (!res.ok) {
-            aiValidationText.textContent = `AI 검증 실패\n\n${rawText || "검증 요청 실패"}`;
-            setSaveStatus("AI 검증 실패", "err");
-            return;
-        }
-
-        const data = await res.json();
-        latestValidationResult = data;
-
-        const ocrTexts = (data.labelTexts ?? []).join(", ") || "-";
-        const labelDetected = data.labelDetected === true;
-        const labelConfidence = Number(data.labelConfidence ?? 0);
-
-        let resultText = "실패";
-        if (labelDetected && labelConfidence >= 0.7) {
-            resultText = "정상";
-        } else if (labelDetected) {
-            resultText = "경고";
-        }
-
-        let statusClass = "ai-fail";
-        if (labelDetected && labelConfidence >= 0.7) statusClass = "ai-ok";
-        else if (labelDetected) statusClass = "ai-warn";
-
-        aiValidationText.innerHTML =
-            `판정 : <span class="${statusClass}">${resultText}</span>
-메시지 : ${data.message ?? "-"}
-텍스트 감지 : ${labelDetected ? "TRUE" : "FALSE"}
-OCR 신뢰도 : ${labelConfidence}
-읽힌 텍스트 : ${ocrTexts}`;
-
-        setSaveStatus(data.ok ? "AI 검증 완료" : "AI 검증 결과 확인", data.ok ? "ok" : "saving");
-    } catch (error) {
-        clearTimeout(timeoutId);
-        console.error(error);
-
-        if (error.name === "AbortError") {
-            aiValidationText.textContent = "AI 검증 요청이 10초 동안 응답이 없어 중단되었습니다.";
-            setSaveStatus("AI 검증 타임아웃", "err");
-        } else {
-            aiValidationText.textContent = "AI 검증 중 오류가 발생했습니다.";
-            setSaveStatus("AI 검증 오류", "err");
-        }
-    } finally {
-        btnValidateAi.disabled = false;
-    }
-}
-
-async function analyzeAiOperation() {
-    if (aiAnalysisBusy) return;
-
-    if (!latestValidationResult) {
-        aiAnalysisText.textContent = "먼저 AI 검증을 실행한 후 분석하세요.";
-        setSaveStatus("AI 검증 후 분석 가능", "err");
-        return;
-    }
-
-    const payload = {
-        rotationDetected: checkRotationEl.checked,
-        labelDetected: latestValidationResult?.labelDetected ?? false,
-        labelTexts: latestValidationResult?.labelTexts ?? [],
-        productionCount: latestDebugState?.productionCount ?? 0
-    };
-
-    try {
-        aiAnalysisBusy = true;
-        btnAiAnalysis.disabled = true;
-        btnAiAnalysis.textContent = "분석 중...";
-        aiAnalysisText.textContent = "AI 운영 분석 중입니다...";
-        setSaveStatus("AI 운영 분석 중입니다...", "saving");
-
-        const res = await fetch("/api/ai/analyze-operations", {
-            method: "POST",
-            headers: roiAuthHeaders({
-                "Content-Type": "application/json"
-            }),
-            body: JSON.stringify(payload)
-        });
-
-        if (await handleUnauthorized(res)) return;
-
-        if (!res.ok) {
-            setSaveStatus("AI 분석 실패", "err");
-            throw new Error(`AI 분석 실패: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        aiAnalysisText.textContent = data.summary ?? "분석 결과가 없습니다.";
-        setSaveStatus("AI 분석 완료", "ok");
-    } catch (err) {
-        console.error(err);
-        aiAnalysisText.textContent = `AI 분석 오류: ${err.message}`;
-        setSaveStatus("AI 분석 오류", "err");
-    } finally {
-        aiAnalysisBusy = false;
-        btnAiAnalysis.disabled = false;
-        btnAiAnalysis.textContent = "AI 분석";
-    }
-}
-
-btnLoad.addEventListener("click", async () => {
-    updatePageTitle();
-    canvasWrap.classList.remove("ready");
-    setSaveStatus("설정 불러오는 중...", "saving");
-    await loadConfig();
-    await loadState();
-    setSaveStatus("불러오기 완료", "ok");
 });
 
-btnModeObject.addEventListener("click", () => setMode("object"));
-btnModeLabel.addEventListener("click", () => setMode("label"));
-btnSave.addEventListener("click", saveRoi);
-btnValidateAi.addEventListener("click", validateAiRoi);
-btnAiAnalysis.addEventListener("click", analyzeAiOperation);
+canvas.addEventListener("mousedown", e => {
+    const rect = canvas.getBoundingClientRect();
+    const p = { x: Math.round(e.clientX - rect.left), y: Math.round(e.clientY - rect.top) };
+    const r = getSelectedRect();
+    const h = getHandleRect(r);
 
-setInterval(async () => {
-    if (refreshBusy || saveBusy || aiAnalysisBusy || activeAction || roiDirty) {
-        if (roiDirty && !saveBusy && !aiAnalysisBusy && !activeAction) {
-            await loadState();
-        }
-        return;
+    dragMouseStart = p;
+    dragRectStart = { ...r };
+    if (pointInRect(p.x, p.y, h)) activeAction = "resize";
+    else if (pointInRect(p.x, p.y, r)) activeAction = "move";
+});
+
+window.addEventListener("mousemove", e => {
+    if (!activeAction) return;
+    const canvasRect = canvas.getBoundingClientRect();
+    const p = { x: Math.round(e.clientX - canvasRect.left), y: Math.round(e.clientY - canvasRect.top) };
+    let r = { ...dragRectStart };
+
+    if (activeAction === "move") {
+        r.x = dragRectStart.x + (p.x - dragMouseStart.x);
+        r.y = dragRectStart.y + (p.y - dragMouseStart.y);
+    } else {
+        r.w = Math.max(MIN_SIZE, dragRectStart.w + (p.x - dragMouseStart.x));
+        r.h = Math.max(MIN_SIZE, dragRectStart.h + (p.y - dragMouseStart.y));
     }
+    setSelectedRect(clampRectToCanvas(r));
+    roiDirty = true;
+    setSaveStatus("수정됨", "saving");
+    drawCanvas();
+});
 
-    refreshBusy = true;
-    try {
-        await refreshImageOnly();
+window.addEventListener("mouseup", () => activeAction = null);
+
+// --- Initialization ---
+async function init() {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js";
+    script.onload = async () => {
+        await loadCameraOptions();
+        await connectHub();
+        await loadConfig();
         await loadState();
-    } finally {
-        refreshBusy = false;
-    }
-}, 1000);
+        await updateImage();
+    };
+    document.head.appendChild(script);
+}
 
-(async function init() {
-    if (window.updateGlobalHubState) {
-        window.updateGlobalHubState("connected", "ROI Ready");
-    }
-
-    canvasWrap.classList.remove("ready");
-    setSaveStatus("초기 로딩 중...", "saving");
-    await loadConfig();
-    await loadState();
-    setSaveStatus("준비됨", "idle");
-})();
+init();

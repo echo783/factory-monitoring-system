@@ -71,7 +71,8 @@ namespace RealtimeEventApi.Application.Camera
                     ChangedAt = DateTime.Now,
                     LastSuccessfulReadAt = null,
                     LastErrorAt = startResult.LastErrorAt,
-                    LastErrorMessage = startResult.ErrorMessage
+                    LastErrorMessage = startResult.ErrorMessage,
+                    ProductionCount = 0
                 };
         }
 
@@ -110,7 +111,8 @@ namespace RealtimeEventApi.Application.Camera
                     ChangedAt = DateTime.Now,
                     LastSuccessfulReadAt = null,
                     LastErrorAt = null,
-                    LastErrorMessage = state?.LastErrorMessage ?? string.Empty
+                    LastErrorMessage = state?.LastErrorMessage ?? string.Empty,
+                    ProductionCount = state?.ProductionCount ?? 0
                 };
         }
 

@@ -11,5 +11,6 @@
         public DateTime? LastSuccessfulReadAt { get; set; }
         public DateTime? LastErrorAt { get; set; }
         public string LastErrorMessage { get; set; } = string.Empty;
+        public int ProductionCount { get; set; }
     }
 }

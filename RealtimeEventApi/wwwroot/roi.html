@@ -25,14 +25,15 @@
                     </div>
 
                     <div class="toolbar-row">
-                        <label class="field">
-                            <span class="field-label">Camera ID</span>
-                            <input type="number" id="cameraId" value="1" class="input-base" />
+                        <label class="field" for="cameraSelect">
+                            <span class="field-label">카메라 선택</span>
+                            <select id="cameraSelect" class="select-base"></select>
                         </label>
 
                         <div class="tool-controls">
                             <div class="button-group">
                                 <button id="btnLoad" class="tool-btn btn-secondary" type="button">불러오기</button>
+                                <button id="btnLiveRefresh" class="tool-btn btn-toggle" type="button">라이브 화면 갱신</button>
                                 <button id="btnModeObject" class="tool-btn btn-toggle active-mode" type="button">회전 ROI</button>
                                 <button id="btnModeLabel" class="tool-btn btn-toggle" type="button">라벨 ROI</button>
                                 <button id="btnSave" class="tool-btn btn-primary btn-emphasize" type="button">ROI 저장</button>
@@ -62,6 +63,7 @@
 
                         <div class="roi-canvas-shell">
                             <div id="canvasWrap" class="canvas-wrap">
+                                <div id="statusOverlay" class="status-overlay" hidden>카메라가 실행 중이 아닙니다.</div>
                                 <img id="bgImage" class="roi-image" alt="ROI 배경 이미지" />
                                 <canvas id="roiCanvas" class="roi-canvas"></canvas>
                             </div>
