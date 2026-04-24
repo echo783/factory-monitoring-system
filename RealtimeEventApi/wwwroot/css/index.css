@@ -149,6 +149,16 @@ body {
 
 .camera-status { border:1px solid var(--border); border-radius:12px; padding:12px; background:#fff; display:flex; flex-direction:column; min-height:0; overflow:auto; flex:1 1 auto; }
 
+.three-view {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #000;
+    flex: 1 1 200px;
+    min-height: 200px;
+    overflow: hidden;
+    position: relative;
+}
+
 .camera-status__header {
     display: flex;
     align-items: center;

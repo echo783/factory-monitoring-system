@@ -20,6 +20,214 @@ let signalRConnection = null;
 let joinedCameraGroupId = null;
 const MAX_EVENT_LOG = 20;
 
+// --- Three.js State ---
+let scene, camera, renderer, turntableGroup, product, roiBox, threeCamera, sightLine, countSprite;
+let lastProductionCount = 0;
+let isSimulating = false;
+
+function initThreeScene() {
+    const container = document.getElementById('threeView');
+    if (!container) return;
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0a);
+
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(8, 6, 8);
+    camera.lookAt(0, 1, 0);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+    const spotLight = new THREE.SpotLight(0xffffff, 1.5);
+    spotLight.position.set(10, 15, 10);
+    scene.add(spotLight);
+
+    // 1. Turntable Group
+    turntableGroup = new THREE.Group();
+    scene.add(turntableGroup);
+
+    const tableGeo = new THREE.CylinderGeometry(4, 4, 0.2, 32);
+    const tableMat = new THREE.MeshPhongMaterial({ color: 0x222222 });
+    const tableMesh = new THREE.Mesh(tableGeo, tableMat);
+    tableMesh.position.y = -0.1;
+    turntableGroup.add(tableMesh);
+
+    // 2. Product Group
+    const prodGroup = new THREE.Group();
+    prodGroup.position.set(2.8, 0.8, 0);
+    turntableGroup.add(prodGroup);
+
+    const bodyGeo = new THREE.CylinderGeometry(0.6, 0.6, 1.6, 16);
+    const bodyMat = new THREE.MeshPhongMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.8 });
+    product = new THREE.Mesh(bodyGeo, bodyMat);
+    prodGroup.add(product);
+
+    const capGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.4, 12);
+    const capMat = new THREE.MeshPhongMaterial({ color: 0x334155 });
+    const capMesh = new THREE.Mesh(capGeo, capMat);
+    capMesh.position.y = 1.0;
+    prodGroup.add(capMesh);
+
+    // 3. ROI Plane
+    const roiGeo = new THREE.PlaneGeometry(0.8, 0.8);
+    const roiMat = new THREE.MeshBasicMaterial({ 
+        color: 0x00ff00, 
+        transparent: true, 
+        opacity: 0.4, 
+        side: THREE.DoubleSide 
+    });
+    roiBox = new THREE.Mesh(roiGeo, roiMat);
+    roiBox.position.set(0, 0, 0.61);
+    prodGroup.add(roiBox);
+
+    const edges = new THREE.EdgesGeometry(roiGeo);
+    const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x00ff00 }));
+    roiBox.add(line);
+
+    // 4. Count Sprite Label
+    countSprite = createTextSprite("0");
+    countSprite.position.set(0, 1.8, 0);
+    prodGroup.add(countSprite);
+
+    // 5. Static Camera
+    const camGroup = new THREE.Group();
+    camGroup.position.set(7, 2.5, 0);
+    scene.add(camGroup);
+
+    const camBodyGeo = new THREE.BoxGeometry(0.6, 0.6, 1.2);
+    const camBodyMat = new THREE.MeshPhongMaterial({ color: 0x3b82f6 });
+    threeCamera = new THREE.Mesh(camBodyGeo, camBodyMat);
+    threeCamera.lookAt(0, 1.5, 0);
+    camGroup.add(threeCamera);
+
+    // 6. Sightline (Beam)
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.2 });
+    const lineGeo = new THREE.CylinderGeometry(0.02, 0.05, 1);
+    sightLine = new THREE.Mesh(lineGeo, lineMat);
+    scene.add(sightLine);
+
+    // Grid
+    const grid = new THREE.GridHelper(20, 20, 0x333333, 0x222222);
+    grid.position.y = -0.2;
+    scene.add(grid);
+
+    window.addEventListener('resize', onThreeResize);
+    animateThree();
+}
+
+function createTextSprite(text) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 128;
+    canvas.height = 64;
+    
+    context.fillStyle = 'rgba(0,0,0,0.5)';
+    context.fillRect(0, 0, 128, 64);
+    context.strokeStyle = '#3b82f6';
+    context.lineWidth = 4;
+    context.strokeRect(0, 0, 128, 64);
+    
+    context.fillStyle = '#ffffff';
+    context.font = 'bold 40px Arial';
+    context.textAlign = 'center';
+    context.fillText(text, 64, 46);
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    const sprite = new THREE.Sprite(spriteMaterial);
+    sprite.scale.set(1.5, 0.75, 1);
+    return sprite;
+}
+
+function updateCountSprite(text) {
+    if (!countSprite) return;
+    const canvas = countSprite.material.map.image;
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, 128, 64);
+    
+    context.fillStyle = 'rgba(0,0,0,0.5)';
+    context.fillRect(0, 0, 128, 64);
+    context.strokeStyle = '#3b82f6';
+    context.lineWidth = 4;
+    context.strokeRect(0, 0, 128, 64);
+    
+    context.fillStyle = '#ffffff';
+    context.font = 'bold 40px Arial';
+    context.textAlign = 'center';
+    context.fillText(text, 64, 46);
+    
+    countSprite.material.map.needsUpdate = true;
+}
+
+function onThreeResize() {
+    const container = document.getElementById('threeView');
+    if (!container || !camera || !renderer) return;
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+}
+
+function animateThree() {
+    requestAnimationFrame(animateThree);
+
+    if (isSimulating) {
+        turntableGroup.rotation.y -= 0.02;
+
+        const roiWorldPos = new THREE.Vector3();
+        roiBox.getWorldPosition(roiWorldPos);
+        const camWorldPos = new THREE.Vector3();
+        threeCamera.getWorldPosition(camWorldPos);
+
+        // Update Sightline Beam
+        const direction = new THREE.Vector3().subVectors(roiWorldPos, camWorldPos);
+        const distance = direction.length();
+        
+        sightLine.scale.set(1, distance, 1);
+        sightLine.position.copy(camWorldPos).add(direction.multiplyScalar(0.5));
+        sightLine.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
+
+        // Tracking Logic
+        if (roiWorldPos.x > 2.5 && Math.abs(roiWorldPos.z) < 1.2) {
+            roiBox.material.color.setHex(0xff0000);
+            roiBox.material.opacity = 0.7;
+            sightLine.material.opacity = 0.6;
+        } else {
+            roiBox.material.color.setHex(0x00ff00);
+            roiBox.material.opacity = 0.2;
+            sightLine.material.opacity = 0.1;
+        }
+    } else {
+        sightLine.scale.set(0.001, 0.001, 0.001);
+    }
+
+    renderer.render(scene, camera);
+}
+
+function triggerDetectionAnimation() {
+    if (!product || !roiBox) return;
+    
+    // Scale pulse
+    const originalScale = 1.0;
+    product.scale.set(1.3, 1.3, 1.3);
+    
+    // Blink ROI
+    const originalOpacity = roiBox.material.opacity;
+    roiBox.material.color.setHex(0xffffff);
+    roiBox.material.opacity = 1.0;
+    
+    setTimeout(() => {
+        product.scale.set(originalScale, originalScale, originalScale);
+        roiBox.material.color.setHex(0xff0000);
+        roiBox.material.opacity = originalOpacity;
+    }, 150);
+}
+
+// --- Dashboard Logic ---
+
 function redirectToLogin() {
     location.href = "/login.html";
 }
@@ -101,16 +309,26 @@ function updateDashboard(data) {
         liveBadgeEl.className = "status-pill";
         if (status === "Running") {
             liveBadgeEl.classList.add("status-pill--running");
+            isSimulating = true;
         } else if (status === "Stopped") {
             liveBadgeEl.classList.add("status-pill--stopped");
-        } else if (status === "Starting" || status === "Connecting") {
-            liveBadgeEl.classList.add("status-pill--neutral");
+            isSimulating = false;
         } else {
             liveBadgeEl.classList.add("status-pill--neutral");
+            isSimulating = (status === "Starting" || status === "Connecting");
         }
     }
 
     if (liveMsgEl) liveMsgEl.textContent = data.message || "-";
+
+    // Update 3D Count Label
+    updateCountSprite((data.productionCount ?? 0).toString());
+
+    // 3D Animation trigger on count change
+    if (data.productionCount > lastProductionCount) {
+        triggerDetectionAnimation();
+    }
+    lastProductionCount = data.productionCount;
 
     updateControlButtons(data.status);
 }
@@ -132,18 +350,6 @@ function updateControlButtons(status) {
         btnStopEl.disabled = false;
     } else {
         btnStopEl.disabled = true;
-    }
-}
-
-function updateCameraOptionLabel(data) {
-    if (!(cameraSelectEl instanceof HTMLSelectElement)) return;
-
-    const options = cameraSelectEl.options;
-    for (let i = 0; i < options.length; i++) {
-        if (Number(options[i].value) === Number(data.cameraId)) {
-            options[i].textContent = `${data.cameraName} (${data.cameraId}) - ${data.enabled ? "사용중" : "비활성"}`;
-            break;
-        }
     }
 }
 
@@ -173,6 +379,10 @@ function renderCameraStatus(data) {
                 <span class="camera-status__meta-value">${data.enabled}</span>
             </div>
             <div class="camera-status__meta-item">
+                <span class="camera-status__meta-label">Production</span>
+                <span class="camera-status__meta-value">${data.productionCount ?? 0}</span>
+            </div>
+            <div class="camera-status__meta-item">
                 <span class="camera-status__meta-label">ChangedAt</span>
                 <span class="camera-status__meta-value">${changedAt}</span>
             </div>
@@ -184,6 +394,18 @@ function renderCameraStatus(data) {
 
     updateDashboard(data);
     updateCameraOptionLabel(data);
+}
+
+function updateCameraOptionLabel(data) {
+    if (!(cameraSelectEl instanceof HTMLSelectElement)) return;
+
+    const options = cameraSelectEl.options;
+    for (let i = 0; i < options.length; i++) {
+        if (Number(options[i].value) === Number(data.cameraId)) {
+            options[i].textContent = `${data.cameraName} (${data.cameraId}) - ${data.enabled ? "사용중" : "비활성"}`;
+            break;
+        }
+    }
 }
 
 function renderCameraOptions(cameras) {
@@ -459,6 +681,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btnQuickNextEl) btnQuickNextEl.addEventListener("click", () => selectCameraByIndex(cameraSelectEl.selectedIndex + 1));
 
     setHubState("reconnecting");
+    initThreeScene(); // Initialize 3D View
     await loadCameraOptions();
     await connectCameraStatusHub();
     await loadCameraStatus();
