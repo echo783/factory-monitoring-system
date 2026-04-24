@@ -146,8 +146,8 @@ Edition : Express Edition (64-bit)
 create DB : FactoryDB
 docs/sql/schema-and-seed.sql 실행
 
-##포트폴리오
-myport.pdf
+## 포트폴리오
+docs/myport.pdf
 
 
 
