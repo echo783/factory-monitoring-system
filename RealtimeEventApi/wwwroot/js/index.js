@@ -90,6 +90,8 @@ function pushEventLog(message) {
 }
 
 function updateDashboard(data) {
+    if (Number(data.cameraId) !== cameraId) return;
+
     if (liveNameEl) liveNameEl.textContent = data.cameraName || "-";
     if (liveIdEl) liveIdEl.textContent = "ID: " + (data.cameraId || "-");
 
@@ -101,15 +103,52 @@ function updateDashboard(data) {
             liveBadgeEl.classList.add("status-pill--running");
         } else if (status === "Stopped") {
             liveBadgeEl.classList.add("status-pill--stopped");
+        } else if (status === "Starting" || status === "Connecting") {
+            liveBadgeEl.classList.add("status-pill--neutral");
         } else {
             liveBadgeEl.classList.add("status-pill--neutral");
         }
     }
 
     if (liveMsgEl) liveMsgEl.textContent = data.message || "-";
+
+    updateControlButtons(data.status);
+}
+
+function updateControlButtons(status) {
+    if (!btnStartEl || !btnStopEl) return;
+
+    const s = (status || "").toString();
+
+    // 시작 버튼 제어
+    if (s === "Stopped" || s === "Error") {
+        btnStartEl.disabled = false;
+    } else {
+        btnStartEl.disabled = true;
+    }
+
+    // 중지 버튼 제어
+    if (s === "Running" || s === "Stale") {
+        btnStopEl.disabled = false;
+    } else {
+        btnStopEl.disabled = true;
+    }
+}
+
+function updateCameraOptionLabel(data) {
+    if (!(cameraSelectEl instanceof HTMLSelectElement)) return;
+
+    const options = cameraSelectEl.options;
+    for (let i = 0; i < options.length; i++) {
+        if (Number(options[i].value) === Number(data.cameraId)) {
+            options[i].textContent = `${data.cameraName} (${data.cameraId}) - ${data.enabled ? "사용중" : "비활성"}`;
+            break;
+        }
+    }
 }
 
 function renderCameraStatus(data) {
+    if (Number(data.cameraId) !== cameraId) return;
     if (!cameraStatusEl) return;
 
     const status = data.status || "Unknown";
@@ -144,6 +183,7 @@ function renderCameraStatus(data) {
     `;
 
     updateDashboard(data);
+    updateCameraOptionLabel(data);
 }
 
 function renderCameraOptions(cameras) {
@@ -243,7 +283,6 @@ async function connectCameraStatusHub() {
             .build();
 
         signalRConnection.on("CameraStatusChanged", (payload) => {
-            loadCameraOptions();
             if (Number(payload?.cameraId) !== cameraId) return;
             renderCameraStatus(payload);
             pushEventLog(`카메라 ${payload.cameraId} 상태 변경: ${payload.status}`);
@@ -335,21 +374,16 @@ async function startCamera() {
         if (await handleUnauthorized(res)) return;
         const data = res.ok ? await res.json() : null;
 
-        if (data) {
-            renderCameraStatus(data);
-        }
-
         const status = (data?.status || "").toString();
         const succeeded = res.ok && status !== "Error";
+
         pushEventLog(succeeded
-            ? `카메라 ${cameraId} 시작 요청: ${status || "OK"}`
+            ? `카메라 ${cameraId} 시작 요청 성공: ${status || "OK"}`
             : `카메라 ${cameraId} 시작 실패${data?.message ? ` - ${data.message}` : ""}`);
 
-        await loadCameraOptions();
-        await loadCameraStatus();
     } catch (error) {
         console.error(error);
-        pushEventLog(`카메라 ${cameraId} 시작 오류`);
+        pushEventLog(`카메라 ${cameraId} 시작 오류 발생`);
     } finally {
         setButtonBusy(btnStartEl, false);
         if (btnStartEl) btnStartEl.textContent = "시작";
@@ -369,21 +403,16 @@ async function stopCamera() {
         if (await handleUnauthorized(res)) return;
         const data = res.ok ? await res.json() : null;
 
-        if (data) {
-            renderCameraStatus(data);
-        }
-
         const status = (data?.status || "").toString();
         const succeeded = res.ok && status !== "Error";
+
         pushEventLog(succeeded
-            ? `카메라 ${cameraId} 중지 요청: ${status || "OK"}`
+            ? `카메라 ${cameraId} 중지 요청 성공: ${status || "OK"}`
             : `카메라 ${cameraId} 중지 실패${data?.message ? ` - ${data.message}` : ""}`);
 
-        await loadCameraOptions();
-        await loadCameraStatus();
     } catch (error) {
         console.error(error);
-        pushEventLog(`카메라 ${cameraId} 중지 오류`);
+        pushEventLog(`카메라 ${cameraId} 중지 오류 발생`);
     } finally {
         setButtonBusy(btnStopEl, false);
         if (btnStopEl) btnStopEl.textContent = "중지";
@@ -396,6 +425,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (cameraSelectEl) {
         cameraSelectEl.addEventListener("change", async () => {
             cameraId = Number(cameraSelectEl.value) || 1;
+
+            // 즉시 UI 레이블 업데이트 (이전 카메라 정보 잔상 제거)
+            const selectedOpt = cameraSelectEl.options[cameraSelectEl.selectedIndex];
+            if (liveNameEl && selectedOpt) {
+                // "이름 (ID) - 상태" 형식에서 이름만 추출
+                liveNameEl.textContent = selectedOpt.text.split(" (")[0];
+            }
+            if (liveIdEl) liveIdEl.textContent = "ID: " + cameraId;
+            if (liveBadgeEl) {
+                liveBadgeEl.textContent = "Syncing...";
+                liveBadgeEl.className = "status-pill status-pill--neutral";
+            }
+
+            // 하단 상세 상태 패널 초기화
+            if (cameraStatusEl) {
+                cameraStatusEl.innerHTML = `<div class="page-desc">카메라 정보를 동기화 중입니다...</div>`;
+            }
+
+            // 버튼 비지 상태 및 비활성화 초기화
+            setButtonBusy(btnStartEl, false);
+            setButtonBusy(btnStopEl, false);
+            updateControlButtons("Unknown");
+
             await switchCameraGroup(cameraId);
             await loadCameraStatus();
         });
