@@ -1,0 +1,7 @@
+*.cs linguist-language=C#
+*.js linguist-language=JavaScript
+*.ts linguist-language=TypeScript
+*.html linguist-language=HTML
+
+# 특정 폴더 제외
+wwwroot/* linguist-vendored
