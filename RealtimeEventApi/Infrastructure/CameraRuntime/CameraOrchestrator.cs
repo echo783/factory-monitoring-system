@@ -4,6 +4,7 @@ using RealtimeEventApi.Contracts.Responses.Camera;
 
 namespace RealtimeEventApi.Infrastructure.CameraRuntime
 {
+    // TODO: Runtime / Reader / Controller 책임을 분리해 오케스트레이션, 조회, 명령 처리 경계를 명확히 해야 한다.
     public sealed class CameraOrchestrator : BackgroundService, ICameraRuntimeReader, ICameraRuntimeController
     {
         private readonly IServiceScopeFactory _scopeFactory;
@@ -18,6 +19,8 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
         private readonly System.Collections.Concurrent.ConcurrentDictionary<int, string> _cameraNames = new();
         private readonly System.Collections.Concurrent.ConcurrentDictionary<int, string> _lastStatusSignatures = new();
         private readonly System.Collections.Concurrent.ConcurrentDictionary<int, SemaphoreSlim> _cameraLocks = new();
+        // 전체 종료(StopAsync) 시 세션 목록 정리를 보호하는 전역 lock이다.
+        // 일반 Start/Stop 및 자동 동기화는 cameraId 단위 lock(_cameraLocks)을 사용한다.
         private readonly SemaphoreSlim _sessionLock = new(1, 1);
         private static readonly TimeSpan ManualStartFrameTimeout = TimeSpan.FromSeconds(12);
 
@@ -230,13 +233,15 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                     var cameraConfigs = await LoadEnabledCamerasAsync(stoppingToken);
                     var currentIds = cameraConfigs.Select(x => x.CameraId).ToHashSet();
 
-                    await _sessionLock.WaitAsync(stoppingToken);
-                    try
+                    foreach (var cam in cameraConfigs)
                     {
-                        foreach (var cam in cameraConfigs)
-                        {
-                            _cameraNames[cam.CameraId] = cam.CameraName;
+                        _cameraNames[cam.CameraId] = cam.CameraName;
 
+                        var camLock = _cameraLocks.GetOrAdd(cam.CameraId, _ => new SemaphoreSlim(1, 1));
+                        await camLock.WaitAsync(stoppingToken);
+                        try
+                        {
+                            // TODO: ContainsKey 사전 확인 대신 TryAdd 기반의 단일 경로로 통합한다.
                             if (_sessions.ContainsKey(cam.CameraId))
                                 continue;
 
@@ -264,12 +269,21 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                                 await runner.DisposeAsync();
                             }
                         }
+                        finally
+                        {
+                            camLock.Release();
+                        }
+                    }
 
-                        var removedIds = _sessions.Keys
-                            .Where(id => !currentIds.Contains(id))
-                            .ToList();
+                    var removedIds = _sessions.Keys
+                        .Where(id => !currentIds.Contains(id))
+                        .ToList();
 
-                        foreach (var id in removedIds)
+                    foreach (var id in removedIds)
+                    {
+                        var camLock = _cameraLocks.GetOrAdd(id, _ => new SemaphoreSlim(1, 1));
+                        await camLock.WaitAsync(stoppingToken);
+                        try
                         {
                             if (_sessions.TryGetValue(id, out var runner))
                             {
@@ -287,10 +301,10 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                                 await NotifyStatusAsync(id, cameraName ?? string.Empty, false, stoppingToken);
                             }
                         }
-                    }
-                    finally
-                    {
-                        _sessionLock.Release();
+                        finally
+                        {
+                            camLock.Release();
+                        }
                     }
 
                     await PublishCurrentStatusesAsync(cameraConfigs, stoppingToken);
