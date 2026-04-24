@@ -69,7 +69,7 @@ API 중심 구조
 Runtime / Application 분리
 외부 AI 서비스와 유연한 연동 구조
 
-Key Features
+## Key Features
 RTSP 기반 실시간 영상 처리
 ROI 기반 이벤트 감지
 생산 이벤트 카운팅 및 상태 관리
@@ -79,7 +79,7 @@ ROI 디버그 및 설정 UI
 OCR 기반 라벨 검증 (Python 서비스 연동)
 AI Collaboration
 
-이 시스템은 다음과 같은 AI 도구들과 협업하여 개발되었습니다.
+## 이 시스템은 다음과 같은 AI 도구들과 협업하여 개발되었습니다.
 
 ChatGPT
 시스템 설계 및 문제 해결
@@ -98,8 +98,8 @@ System Orchestrator
 AI 결과 검토 및 통합
 실제 동작 가능한 구조로 연결
 
-AI tools were used as engineering partners, not as shortcuts.
-Human judgment connected the AI-assisted outputs into one working system.
+**AI tools were used as engineering partners, not as shortcuts.
+Human judgment connected the AI-assisted outputs into one working system.**
 
 Tech Stack
 Backend: ASP.NET Core
