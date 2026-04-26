@@ -16,7 +16,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
         public Task PublishAsync(CameraRunStatusResponse status, CancellationToken token = default)
         {
             return _hubContext.Clients
-                .Group($"camera-{status.CameraId}")
+                .Groups($"camera-{status.CameraId}", CameraHub.DashboardGroup)
                 .SendAsync("CameraStatusChanged", status, token);
         }
     }

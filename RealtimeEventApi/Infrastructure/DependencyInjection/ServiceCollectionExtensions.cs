@@ -75,9 +75,15 @@ namespace RealtimeEventApi.Infrastructure.DependencyInjection
             services.AddSingleton<SnapshotFileService>();
             services.AddSingleton<ProductionPersistenceService>();
             services.AddSingleton<CameraRuntimeStatusFactory>();
+            services.AddSingleton<CameraRuntimeRegistry>();
+            services.AddSingleton<CameraRuntimeLifecycleState>();
+            services.AddSingleton<CameraRuntimeSessionLifecycle>();
+            services.AddSingleton<CameraSessionRunnerFactory>();
+            services.AddSingleton<CameraRuntimeReader>();
+            services.AddSingleton<CameraRuntimeController>();
             services.AddSingleton<CameraOrchestrator>();
-            services.AddSingleton<ICameraRuntimeReader>(sp => sp.GetRequiredService<CameraOrchestrator>());
-            services.AddSingleton<ICameraRuntimeController>(sp => sp.GetRequiredService<CameraOrchestrator>());
+            services.AddSingleton<ICameraRuntimeReader>(sp => sp.GetRequiredService<CameraRuntimeReader>());
+            services.AddSingleton<ICameraRuntimeController>(sp => sp.GetRequiredService<CameraRuntimeController>());
             services.AddSingleton<ICameraStatusPublisher, SignalRCameraStatusPublisher>();
             services.AddHostedService(sp => sp.GetRequiredService<CameraOrchestrator>());
             services.AddSingleton<ILabelDetector, DummyLabelDetector>();

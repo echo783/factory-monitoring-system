@@ -19,6 +19,7 @@ const liveMsgEl = document.getElementById("liveMsg");
 let signalRConnection = null;
 let joinedCameraGroupId = null;
 const MAX_EVENT_LOG = 20;
+const cameraStatusCache = new Map();
 
 // --- Three.js State ---
 let scene, camera, renderer, turntableGroup, product, roiBox, threeCamera, sightLine, countSprite;
@@ -285,6 +286,13 @@ function setButtonBusy(button, isBusy, busyText) {
     button.textContent = button.dataset.originalText || button.textContent || "";
 }
 
+function clearButtonBusy(button) {
+    if (!(button instanceof HTMLButtonElement)) return;
+
+    button.classList.remove("btn-loading");
+    button.textContent = button.dataset.originalText || button.textContent || "";
+}
+
 function pushEventLog(message) {
     if (!(eventLogEl instanceof HTMLElement)) return;
 
@@ -396,13 +404,29 @@ function renderCameraStatus(data) {
     updateCameraOptionLabel(data);
 }
 
+function cacheCameraStatus(data) {
+    const receivedCameraId = Number(data?.cameraId);
+    if (!Number.isFinite(receivedCameraId)) return;
+
+    cameraStatusCache.set(receivedCameraId, data);
+}
+
+function applyCachedCameraStatus() {
+    const cached = cameraStatusCache.get(cameraId);
+    if (!cached) return false;
+
+    renderCameraStatus(cached);
+    return true;
+}
+
 function updateCameraOptionLabel(data) {
     if (!(cameraSelectEl instanceof HTMLSelectElement)) return;
 
     const options = cameraSelectEl.options;
     for (let i = 0; i < options.length; i++) {
         if (Number(options[i].value) === Number(data.cameraId)) {
-            options[i].textContent = `${data.cameraName} (${data.cameraId}) - ${data.enabled ? "사용중" : "비활성"}`;
+            const statusText = data.status || (data.enabled ? "사용중" : "비활성");
+            options[i].textContent = `${data.cameraName} (${data.cameraId}) - ${statusText}`;
             break;
         }
     }
@@ -486,6 +510,14 @@ async function switchCameraGroup(nextCameraId) {
     joinedCameraGroupId = nextCameraId;
 }
 
+async function joinDashboardGroup() {
+    if (!signalRConnection) return;
+    if (signalRConnection.state !== "Connected") return;
+
+    await signalRConnection.invoke("JoinDashboardGroup");
+    pushEventLog("그룹 가입: camera-dashboard");
+}
+
 async function connectCameraStatusHub() {
     if (!ensureLoggedIn()) return;
 
@@ -505,9 +537,15 @@ async function connectCameraStatusHub() {
             .build();
 
         signalRConnection.on("CameraStatusChanged", (payload) => {
-            if (Number(payload?.cameraId) !== cameraId) return;
+            const receivedCameraId = Number(payload?.cameraId);
+            console.log("CameraStatusChanged received", payload);
+            pushEventLog(`CameraStatusChanged received: camera-${Number.isFinite(receivedCameraId) ? receivedCameraId : "-"} ${payload?.status || "-"}`);
+
+            cacheCameraStatus(payload);
+            updateCameraOptionLabel(payload);
+
+            if (receivedCameraId !== cameraId) return;
             renderCameraStatus(payload);
-            pushEventLog(`카메라 ${payload.cameraId} 상태 변경: ${payload.status}`);
         });
 
         signalRConnection.onreconnecting(() => {
@@ -516,6 +554,7 @@ async function connectCameraStatusHub() {
         });
 
         signalRConnection.onreconnected(async () => {
+            await joinDashboardGroup();
             await switchCameraGroup(cameraId);
             await loadCameraStatus();
             setHubState("connected");
@@ -530,6 +569,7 @@ async function connectCameraStatusHub() {
         await signalRConnection.start();
         setHubState("connected");
         pushEventLog("SignalR 연결 성공");
+        await joinDashboardGroup();
         await switchCameraGroup(cameraId);
     } catch (error) {
         console.error(error);
@@ -577,6 +617,7 @@ async function loadCameraStatus(fromButton = false) {
         if (!res.ok) return;
 
         const data = await res.json();
+        cacheCameraStatus(data);
         renderCameraStatus(data);
     } catch (error) {
         console.error(error);
@@ -607,8 +648,10 @@ async function startCamera() {
         console.error(error);
         pushEventLog(`카메라 ${cameraId} 시작 오류 발생`);
     } finally {
-        setButtonBusy(btnStartEl, false);
-        if (btnStartEl) btnStartEl.textContent = "시작";
+        clearButtonBusy(btnStartEl);
+        if (!applyCachedCameraStatus()) {
+            await loadCameraStatus();
+        }
     }
 }
 
@@ -636,8 +679,10 @@ async function stopCamera() {
         console.error(error);
         pushEventLog(`카메라 ${cameraId} 중지 오류 발생`);
     } finally {
-        setButtonBusy(btnStopEl, false);
-        if (btnStopEl) btnStopEl.textContent = "중지";
+        clearButtonBusy(btnStopEl);
+        if (!applyCachedCameraStatus()) {
+            await loadCameraStatus();
+        }
     }
 }
 
@@ -666,9 +711,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             // 버튼 비지 상태 및 비활성화 초기화
-            setButtonBusy(btnStartEl, false);
-            setButtonBusy(btnStopEl, false);
-            updateControlButtons("Unknown");
+            clearButtonBusy(btnStartEl);
+            clearButtonBusy(btnStopEl);
+            if (!applyCachedCameraStatus()) {
+                updateControlButtons("Unknown");
+            }
 
             await switchCameraGroup(cameraId);
             await loadCameraStatus();
