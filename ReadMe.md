@@ -181,6 +181,7 @@ LLM 기반 운영 분석 기능 추가
 - docs/sql/schema-and-seed.sql 실행
 
  2. 서버 실행
- 3. /index.html 접속
+ 3. /lognin.html 접속
+ 4. admin / 1234
 
 
