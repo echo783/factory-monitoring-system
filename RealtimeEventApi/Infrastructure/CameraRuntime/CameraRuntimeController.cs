@@ -12,6 +12,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
         private readonly CameraRuntimeSessionLifecycle _sessionLifecycle;
         private readonly ILogger<CameraRuntimeController> _logger;
         private static readonly TimeSpan ManualStartFrameTimeout = TimeSpan.FromSeconds(12);
+        private readonly CameraRuntimeStatusNotifier _statusNotifier;
 
         public CameraRuntimeController(
             IServiceScopeFactory scopeFactory,
@@ -19,7 +20,8 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
             CameraRuntimeLifecycleState lifecycleState,
             CameraSessionRunnerFactory runnerFactory,
             CameraRuntimeSessionLifecycle sessionLifecycle,
-            ILogger<CameraRuntimeController> logger)
+            ILogger<CameraRuntimeController> logger,
+            CameraRuntimeStatusNotifier statusNotifier)
         {
             _scopeFactory = scopeFactory;
             _registry = registry;
@@ -27,6 +29,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
             _runnerFactory = runnerFactory;
             _sessionLifecycle = sessionLifecycle;
             _logger = logger;
+            _statusNotifier = statusNotifier;
         }
 
         public bool IsRunning(int cameraId)
@@ -110,7 +113,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                 }
 
                 // 즉시 상태 전파 (Starting/Connecting 상태 반영)
-                await _sessionLifecycle.SafeNotifyStatusAsync(cam.CameraId, cam.CameraName, true, token);
+                await _statusNotifier.NotifyStatusAsync(cam.CameraId, cam.CameraName, true, token);
 
                 var connected = await WaitForFirstFrameAsync(runner, ManualStartFrameTimeout, token);
 
@@ -121,7 +124,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                 }
 
                 // 최종 상태 전파 (Running 또는 오류 상태 반영)
-                await _sessionLifecycle.SafeNotifyStatusAsync(cam.CameraId, cam.CameraName, true, token);
+                await _statusNotifier.NotifyStatusAsync(cam.CameraId, cam.CameraName, true, token);
 
                 if (connected)
                     return CameraRuntimeCommandResult.Ok();
@@ -178,7 +181,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                 entry.LastStatusSignature = null;
 
                 // 즉시 상태 전파 (Stopped 상태 반영)
-                await _sessionLifecycle.SafeNotifyStatusAsync(cameraId, cameraName ?? string.Empty, false, token);
+                await _statusNotifier.NotifyStatusAsync(cameraId, cameraName ?? string.Empty, false, token);
 
                 return true;
             }

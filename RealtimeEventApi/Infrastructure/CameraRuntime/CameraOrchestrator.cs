@@ -12,7 +12,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
         private readonly CameraRuntimeRegistry _registry;
         private readonly CameraRuntimeLifecycleState _lifecycleState;
         private readonly CameraRuntimeSessionLifecycle _sessionLifecycle;
-
+        private readonly CameraRuntimeStatusNotifier _statusNotifier;
 
         public CameraOrchestrator(
             IServiceScopeFactory scopeFactory,
@@ -20,7 +20,8 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
             CameraSessionRunnerFactory runnerFactory,
             CameraRuntimeRegistry registry,
             CameraRuntimeLifecycleState lifecycleState,
-            CameraRuntimeSessionLifecycle sessionLifecycle)
+            CameraRuntimeSessionLifecycle sessionLifecycle,
+            CameraRuntimeStatusNotifier statusNotifier)
         {
             _scopeFactory = scopeFactory;
             _logger = logger;
@@ -28,6 +29,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
             _registry = registry;
             _lifecycleState = lifecycleState;
             _sessionLifecycle = sessionLifecycle;
+            _statusNotifier = statusNotifier;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -36,6 +38,12 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
 
             while (!stoppingToken.IsCancellationRequested)
             {
+                if (_lifecycleState.IsShuttingDown)
+                {
+                    _logger.LogInformation("CameraOrchestrator sync loop stopped because application is shutting down.");
+                    break;
+                }
+
                 try
                 {
                     var cameraConfigs = await LoadEnabledCamerasAsync(stoppingToken);
@@ -99,7 +107,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                                     "Camera session removed. CameraId={CameraId}",
                                     id);
 
-                                await _sessionLifecycle.NotifyStatusAsync(id, cameraName ?? string.Empty, false, stoppingToken);
+                                await _statusNotifier.NotifyStatusAsync(id, cameraName ?? string.Empty, false, stoppingToken);
                             }
                         }
                         finally
@@ -183,7 +191,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
         {
             foreach (var cam in cameraConfigs)
             {
-                await _sessionLifecycle.NotifyStatusAsync(cam.CameraId, cam.CameraName, true, token);
+                await _statusNotifier.NotifyStatusAsync(cam.CameraId, cam.CameraName, true, token);
             }
         }
 
