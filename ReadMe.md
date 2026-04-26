@@ -162,15 +162,15 @@ LLM 기반 운영 분석 기능 추가
 
 ## Quick Start (Database)
 
-- 1. MSSQL
+ 1. MSSQL
 - ProductVersion : 17.0.1000.7
 - ProductLevel : RTM
 - Edition : Express Edition (64-bit)
 - create DB : FactoryDB
 - docs/sql/schema-and-seed.sql 실행
 
-- 2. 서버 실행
-- 3. /index.html 접속
+ 2. 서버 실행
+ 3. /index.html 접속
 
 ## 포트폴리오
 - docs/myport.pdf
