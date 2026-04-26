@@ -11,8 +11,6 @@ Industrial Monitoring을 위한 Realtime Event Processing API
 개발 과정에서 AI는 코드 생성 도구가 아니라
 설계 검토, 구조 개선, UI 흐름까지 함께 수행하는 협업 파트너로 활용되었습니다.
 
-저는 그 결과를 검증하고 연결하여
-실제로 동작하는 시스템으로 완성하는 역할을 수행했습니다.
 ---
 
 ## Overview
