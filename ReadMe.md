@@ -95,13 +95,8 @@ CameraRuntimeStatusNotifier
 TrySetRunner → 실행 소유권 획득
 TryTakeRunner → 종료 소유권 회수
 
-이를 통해
-
-중복 실행 방지
-종료 경합 방지
-상태 일관성 유지
-
-를 해결했습니다.
+이를 통해 중복 실행 방지, 종료 경합 방지, 상태 일관성 유지 를 해결했습니다.
+ 
 ## Key Features
 영상 데이터를 이벤트로 변환하는 구조
 ROI 기반 변화 감지를 통한 이벤트 생성
