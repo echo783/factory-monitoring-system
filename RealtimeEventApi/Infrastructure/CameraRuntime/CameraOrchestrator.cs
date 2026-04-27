@@ -54,7 +54,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                         var entry = _registry.GetEntry(cam.CameraId);
                         entry.CameraName = cam.CameraName;
 
-                        var camLock = entry.Lock;
+                        var camLock = entry.StateLock;
                         await camLock.WaitAsync(stoppingToken);
                         try
                         {
@@ -92,7 +92,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                     foreach (var id in removedIds)
                     {
                         var entry = _registry.GetEntry(id);
-                        var camLock = entry.Lock;
+                        var camLock = entry.StateLock;
                         await camLock.WaitAsync(stoppingToken);
                         try
                         {
@@ -143,7 +143,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
             foreach (var cameraId in cameraIds)
             {
                 var entry = _registry.GetEntry(cameraId);
-                var camLock = entry.Lock;
+                var camLock = entry.StateLock;
                 await camLock.WaitAsync(cancellationToken);
                 try
                 {

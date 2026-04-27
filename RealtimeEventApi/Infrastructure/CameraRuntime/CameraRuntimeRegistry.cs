@@ -60,7 +60,8 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
 
     internal sealed class CameraRuntimeEntry
     {
-        public SemaphoreSlim Lock { get; } = new(1, 1);
+        // cameraId별 Start/Stop/Runner 교체를 직렬화하기 위한 비동기 상태 잠금
+        public SemaphoreSlim StateLock { get; } = new(1, 1);
         public CameraSessionRunner? Runner { get; set; }
         public string CameraName { get; set; } = string.Empty;
         public string? LastStatusSignature { get; set; }

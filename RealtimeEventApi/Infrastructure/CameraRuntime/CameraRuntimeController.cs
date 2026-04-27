@@ -53,7 +53,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
                 return CameraRuntimeCommandResult.Fail("애플리케이션 종료 중에는 카메라를 시작할 수 없습니다.");
 
             var entry = _registry.GetEntry(cameraId);
-            var camLock = entry.Lock;
+            var camLock = entry.StateLock;
             await camLock.WaitAsync(token);
             CameraRuntimeConfig? cam = null;
             CameraSessionRunner? runner = null;
@@ -167,7 +167,7 @@ namespace RealtimeEventApi.Infrastructure.CameraRuntime
         public async Task<bool> StopCameraAsync(int cameraId, CancellationToken token = default)
         {
             var entry = _registry.GetEntry(cameraId);
-            var camLock = entry.Lock;
+            var camLock = entry.StateLock;
             await camLock.WaitAsync(token);
             try
             {
